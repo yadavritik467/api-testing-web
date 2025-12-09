@@ -46,7 +46,7 @@ const Home = () => {
     setParams(params.filter((_, i) => i !== index));
   };
 
-  const updateParam = (index: number, field, value) => {
+  const updateParam = (index: number, field:string, value:any) => {
     const newParams: any = [...params];
     newParams[index][field] = value;
     setParams(newParams);
@@ -60,7 +60,7 @@ const Home = () => {
     setHeaders(headers.filter((_, i) => i !== index));
   };
 
-  const updateHeader = (index: number, field: string, value: string) => {
+  const updateHeader = (index: number, field: string, value: any) => {
     const newHeaders: any[] = [...headers];
     newHeaders[index][field] = value;
     setHeaders(newHeaders);
@@ -120,18 +120,68 @@ const Home = () => {
   };
 
   const PutMethod = async () => {
-    try {
-    } catch (error) {}
+   try {
+      const parse = JSON.parse(body);
+      const { data } = await axios.put(
+        url,
+        {
+          ...parse,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...formattedHeaders,
+          },
+        }
+      );
+
+      setShowResponse(data);
+    } catch (error: any) {
+      // console.log("error", error);
+      setShowResponse(error?.response?.data);
+    }
   };
 
   const PatchMethod = async () => {
     try {
-    } catch (error) {}
+      const parse = JSON.parse(body);
+      const { data } = await axios.patch(
+        url,
+        {
+          ...parse,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...formattedHeaders,
+          },
+        }
+      );
+
+      setShowResponse(data);
+    } catch (error: any) {
+      // console.log("error", error);
+      setShowResponse(error?.response?.data);
+    }
   };
 
   const DeleteMethod = async () => {
-    try {
-    } catch (error) {}
+   try {
+      const { data } = await axios.delete(
+        url,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...formattedHeaders,
+          },
+        }
+      );
+
+      setShowResponse(data);
+    } catch (error: any) {
+      // console.log("error", error);
+      setShowResponse(error?.response?.data);
+    }
   };
 
   const sendRequest = () => {
@@ -330,7 +380,7 @@ const Home = () => {
                               type="checkbox"
                               checked={header.enabled}
                               onChange={(e) =>
-                                updateHeader(index, "enabled", e.target.checked)
+                                updateHeader(index, "enabled", (e.target.checked))
                               }
                               className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                             />
