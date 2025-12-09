@@ -158,7 +158,8 @@ const Sidebar = () => {
                     className="flex flex-col border flex-col pl-4 "
                   >
                     <div className=" cursor-pointer flex gap-4 items-center py-3">
-                      <Folder onClick={()=>toggleFolder( colId,folIndex)} className="text-black" />
+                      {fol?.isFolderOpen ? <ChevronDown onClick={()=>toggleFolder( colId,folIndex)} className="text-black" />  :<ChevronRight onClick={()=>toggleFolder( colId,folIndex)} className="text-black" />} 
+                      <Folder className="text-black" />
                       <p>{fol?.folderName}</p>
                     </div>
                     {fol?.isFolderOpen && fol?.hasRequests?.length ? (

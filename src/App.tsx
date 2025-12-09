@@ -16,7 +16,7 @@ const App = () => {
         <div className="col-span-3">
           <Sidebar />
         </div>
-        <div className="col-span-9">
+        <div className="col-span-9 overflow-y-scroll h-[100vh]">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

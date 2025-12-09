@@ -4,13 +4,14 @@ import axios from "axios";
 
 const Home = () => {
   const [method, setMethod] = useState("GET");
-  const [url, setUrl] = useState(
-    "https://rvmonrbchkzjzsbt2p35xlcqbu0lycip.lambda-url.ap-south-1.on.aws/api/v1/srop-myProfile"
+  const [baseUrl ,setBaseUrl] = useState(
+    "https://dummyjson.com/products"
   );
+  const [finalUrl ,setFinalUrl] = useState(baseUrl);
   const [activeTab, setActiveTab] = useState("params");
   const [params, setParams] = useState<
     { key: string; value: string; enabled: boolean }[]
-  >([{ key: "", value: "", enabled: true }]);
+  >([{ key: "", value: "", enabled: false }]);
 
   const [formattedHeaders, setFormattedHeaders] = useState<any>({});
   const [headers, setHeaders] = useState<
@@ -46,7 +47,7 @@ const Home = () => {
     setParams(params.filter((_, i) => i !== index));
   };
 
-  const updateParam = (index: number, field:string, value:any) => {
+  const updateParam = (index: number, field: string, value: any) => {
     const newParams: any = [...params];
     newParams[index][field] = value;
     setParams(newParams);
@@ -66,6 +67,17 @@ const Home = () => {
     setHeaders(newHeaders);
   };
 
+
+  const generateParamsUrl = () => {
+  const activeParams = params
+    .filter(p => p?.enabled && p.key.trim() !== "")
+    .map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
+    .join("&");
+
+  return activeParams ? `${baseUrl}?${activeParams}` : baseUrl;
+};
+
+
   useEffect(() => {
     if (headers) {
       const formatHeaders = headers.reduce((acc, item) => {
@@ -76,11 +88,15 @@ const Home = () => {
     }
   }, [headers]);
 
+  useEffect(() => {
+  const updated = generateParamsUrl();
+  setFinalUrl(updated);
+}, [params, baseUrl]);
+
   const GetMethod = async () => {
     try {
       const { data } = await axios.get(
-        url,
-
+        finalUrl,
         {
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +116,7 @@ const Home = () => {
     try {
       const parse = JSON.parse(body);
       const { data } = await axios.post(
-        url,
+        finalUrl,
         {
           ...parse,
         },
@@ -120,10 +136,10 @@ const Home = () => {
   };
 
   const PutMethod = async () => {
-   try {
+    try {
       const parse = JSON.parse(body);
       const { data } = await axios.put(
-        url,
+        finalUrl,
         {
           ...parse,
         },
@@ -146,7 +162,7 @@ const Home = () => {
     try {
       const parse = JSON.parse(body);
       const { data } = await axios.patch(
-        url,
+        finalUrl,
         {
           ...parse,
         },
@@ -166,16 +182,13 @@ const Home = () => {
   };
 
   const DeleteMethod = async () => {
-   try {
-      const { data } = await axios.delete(
-        url,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...formattedHeaders,
-          },
-        }
-      );
+    try {
+      const { data } = await axios.delete(finalUrl ,{
+        headers: {
+          "Content-Type": "application/json",
+          ...formattedHeaders,
+        },
+      });
 
       setShowResponse(data);
     } catch (error: any) {
@@ -251,8 +264,8 @@ const Home = () => {
             {/* URL Input */}
             <input
               type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              value={finalUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
               placeholder="Enter request URL"
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -380,7 +393,7 @@ const Home = () => {
                               type="checkbox"
                               checked={header.enabled}
                               onChange={(e) =>
-                                updateHeader(index, "enabled", (e.target.checked))
+                                updateHeader(index, "enabled", e.target.checked)
                               }
                               className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                             />
@@ -446,18 +459,18 @@ const Home = () => {
 
         {/* Response Section */}
         {showResponse !== null ? (
-           <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-all",
-                background: "#1e1e1e",
-                color: "white",
-                padding: "10px",
-                borderRadius: "8px",
-              }}
-            >
-              {JSON.stringify(showResponse, null, 2)}
-            </pre>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-all",
+              background: "#1e1e1e",
+              color: "white",
+              padding: "10px",
+              borderRadius: "8px",
+            }}
+          >
+            {JSON.stringify(showResponse, null, 2)}
+          </pre>
         ) : (
           <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
