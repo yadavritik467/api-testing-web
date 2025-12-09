@@ -4,14 +4,17 @@ import { useState } from "react";
 interface Collection {
   id: number;
   isCollectionOpen: boolean;
+  isDubbleClick: boolean;
   collectionName: string;
   hasFolder: {
     folderId: number;
     folderName: string;
     isFolderOpen:boolean,
+    isDubbleClick: boolean;
     hasRequests: {
       reqId: number;
       reqName: string;
+      isDubbleClick: boolean;
       method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
       url: string;
     }[];
@@ -32,16 +35,19 @@ const Sidebar = () => {
     {
       id: 0,
       isCollectionOpen: true,
+      isDubbleClick:false,
       collectionName: "New Collection",
       hasFolder: [
         {
           folderId: 0,
-          folderName: "Folder 1",
+          folderName: "New Folder",
           isFolderOpen:true,
+          isDubbleClick:false,
           hasRequests: [
             {
               reqId: 0,
-              reqName: "Get-Prod",
+              isDubbleClick:false,
+              reqName: "New Request",
               method: "GET",
               url: "",
             },
@@ -56,16 +62,19 @@ const Sidebar = () => {
          {
       id: p?.length +1 ,
       isCollectionOpen: true,
+      isDubbleClick:false,
       collectionName: "New Collection",
       hasFolder: [
         {
           folderId: 0,
-          folderName: "Folder 1",
+          folderName: "New Folder",
+          isDubbleClick:false,
           isFolderOpen:true,
           hasRequests: [
             {
               reqId: 0,
-              reqName: "Get-Prod",
+              isDubbleClick:false,
+              reqName: "New Request",
               method: "GET",
               url: "",
             },
@@ -109,7 +118,24 @@ const Sidebar = () => {
        return updateCol
      })
   }
-  const toggleFolder =(folId:number)=>{}
+  const toggleFolder =(colId:number,folIndex:number)=>{
+     setCollection(collect =>{
+        const updateCol = collect?.map((c,i)=>{
+            if(colId === i){
+               const updateFolders = c?.hasFolder.map((fol,i)=>
+                folIndex === i ? { ...fol , isFolderOpen:!fol?.isFolderOpen } : fol
+              )
+                return {
+                    ...c,
+                    hasFolder : updateFolders
+                }
+            }else{
+                return c
+            }
+        })
+       return updateCol
+     })
+  }
   return (
     <div className="w-full bg-gray-50 flex flex-col border h-[100vh] overflow-y-scroll">
       <button onClick={createCollection} className="bg-blue-600 hover:bg-blue-700 mt-4 w-[70%] mx-auto text-white rounded-lg p-5 ">
@@ -126,13 +152,13 @@ const Sidebar = () => {
             </div>
             {c?.isCollectionOpen && c?.hasFolder?.length ? (
               <div className="flex flex-col">
-                {c?.hasFolder?.map((fol, folId) => (
+                {c?.hasFolder?.map((fol, folIndex) => (
                   <div
-                    key={folId}
+                    key={folIndex}
                     className="flex flex-col border flex-col pl-4 "
                   >
                     <div className=" cursor-pointer flex gap-4 items-center py-3">
-                      <Folder onClick={()=>toggleFolder(folId)} className="text-black" />
+                      <Folder onClick={()=>toggleFolder( colId,folIndex)} className="text-black" />
                       <p>{fol?.folderName}</p>
                     </div>
                     {fol?.isFolderOpen && fol?.hasRequests?.length ? (
