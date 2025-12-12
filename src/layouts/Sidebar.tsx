@@ -1,28 +1,29 @@
-import { ArrowRight, ChevronDown, ChevronRight, Folder } from "lucide-react";
+import { ChevronDown, ChevronRight, Folder, Plus } from "lucide-react";
 import { useState } from "react";
 
+interface Folder {
+  folderId: number;
+  folderName: string;
+  isFolderOpen: boolean;
+  isEditing: boolean;
+  hasRequests: {
+    reqId: number;
+    reqName: string;
+    isEditing: boolean;
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    url: string;
+  }[];
+}
 interface Collection {
   id: number;
   isCollectionOpen: boolean;
-  isDubbleClick: boolean;
+  isEditing: boolean;
   collectionName: string;
-  hasFolder: {
-    folderId: number;
-    folderName: string;
-    isFolderOpen:boolean,
-    isDubbleClick: boolean;
-    hasRequests: {
-      reqId: number;
-      reqName: string;
-      isDubbleClick: boolean;
-      method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-      url: string;
-    }[];
-  }[];
+  hasFolder: Folder[];
 }
 
 const Sidebar = () => {
-    const methodColors: { [key: string]: any } = {
+  const methodColors: { [key: string]: any } = {
     GET: "text-green-500",
     POST: "text-yellow-500",
     PUT: "text-blue-500",
@@ -30,23 +31,22 @@ const Sidebar = () => {
     DELETE: "text-red-500",
   };
 
-  const [inputVal,setInputVal] =useState<string>("")
-   const [collection, setCollection] = useState<Collection[]>([
+  const [collection, setCollection] = useState<Collection[]>([
     {
       id: 0,
       isCollectionOpen: true,
-      isDubbleClick:false,
+      isEditing: false,
       collectionName: "New Collection",
       hasFolder: [
         {
           folderId: 0,
           folderName: "New Folder",
-          isFolderOpen:true,
-          isDubbleClick:false,
+          isFolderOpen: true,
+          isEditing: false,
           hasRequests: [
             {
               reqId: 0,
-              isDubbleClick:false,
+              isEditing: false,
               reqName: "New Request",
               method: "GET",
               url: "",
@@ -57,88 +57,104 @@ const Sidebar = () => {
     },
   ]);
 
-  const createCollection =()=>{
-    setCollection(p=>[...p,
-         {
-      id: p?.length +1 ,
-      isCollectionOpen: true,
-      isDubbleClick:false,
-      collectionName: "New Collection",
-      hasFolder: [
-        {
-          folderId: 0,
-          folderName: "New Folder",
-          isDubbleClick:false,
-          isFolderOpen:true,
-          hasRequests: [
-            {
-              reqId: 0,
-              isDubbleClick:false,
-              reqName: "New Request",
-              method: "GET",
-              url: "",
-            },
-          ],
-        },
-      ],
-    },
-    ])
-  }
+  const createCollection = () => {
+    setCollection((p) => [
+      ...p,
+      {
+        id: p?.length + 1,
+        isCollectionOpen: true,
+        isEditing: false,
+        collectionName: "New Collection",
+        hasFolder: [
+          {
+            folderId: 0,
+            folderName: "New Folder",
+            isEditing: false,
+            isFolderOpen: true,
+            hasRequests: [
+              {
+                reqId: 0,
+                isEditing: false,
+                reqName: "New Request",
+                method: "GET",
+                url: "",
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+  };
 
-  const changeCollectionName=(colId:number)=>{
-    // todo:
+  // collection logic
+  const updateCollection = (
+    colId: number,
+    fn: (c: Collection) => Collection
+  ) => {
+    setCollection((cols) => cols?.map((c) => (c.id === colId ? fn(c) : c)));
+  };
 
-    // setCollection(collect =>{
-    //     const updateCol = collect?.map((c,i)=>{
-    //         if(colId === i){
-    //             return {
-    //                 ...c,
-    //                 isCollectionOpen : !c?.isCollectionOpen
-    //             }
-    //         }else{
-    //             return c
-    //         }
-    //     })
-    //    return updateCol
-    //  })
-  }
+  const changeCollectionName = (colId: number) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      isEditing: c?.isEditing === true ? false : true,
+    }));
+  };
 
-  const toggleCollection =(colId:number)=>{
-     setCollection(collect =>{
-        const updateCol = collect?.map((c,i)=>{
-            if(colId === i){
-                return {
-                    ...c,
-                    isCollectionOpen : !c?.isCollectionOpen
-                }
-            }else{
-                return c
-            }
-        })
-       return updateCol
-     })
-  }
-  const toggleFolder =(colId:number,folIndex:number)=>{
-     setCollection(collect =>{
-        const updateCol = collect?.map((c,i)=>{
-            if(colId === i){
-               const updateFolders = c?.hasFolder.map((fol,i)=>
-                folIndex === i ? { ...fol , isFolderOpen:!fol?.isFolderOpen } : fol
-              )
-                return {
-                    ...c,
-                    hasFolder : updateFolders
-                }
-            }else{
-                return c
-            }
-        })
-       return updateCol
-     })
-  }
+  const saveCollectionName = (colId: number, val: string) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      collectionName: val,
+      isEditing: false,
+    }));
+  };
+
+  // folder logic
+  const updateFolders = (
+    colId: number,
+    folderId: number,
+    fn: (f: Folder) => Folder
+  ) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      hasFolder: c?.hasFolder.map((f) =>
+        f?.folderId === folderId ? fn(f) : f
+      ),
+    }));
+  };
+  const changeFolderName = (colId: number, folderId: number) => {
+    updateFolders(colId, folderId, (f) => ({
+      ...f,
+      isEditing: f?.isEditing === true ? false : true,
+    }));
+  };
+
+  const saveFolderName = (colId: number, folderId: number, val: string) => {
+    updateFolders(colId, folderId, (f) => ({
+      ...f,
+      folderName: val,
+      isEditing: false,
+    }));
+  };
+
+  const toggleCollection = (colId: number) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      isCollectionOpen: !c?.isCollectionOpen,
+    }));
+  };
+  const toggleFolder = (colId: number, folderId: number) => {
+    updateFolders(colId, folderId, (f) => ({
+      ...f,
+      isFolderOpen: !f?.isFolderOpen,
+    }));
+  };
   return (
     <div className="w-full bg-gray-50 flex flex-col border h-[100vh] overflow-y-scroll">
-      <button onClick={createCollection} className="bg-blue-600 hover:bg-blue-700 mt-4 w-[70%] mx-auto text-white rounded-lg p-5 ">
+      <button
+        onClick={createCollection}
+        className="bg-blue-600 hover:bg-blue-700 mt-4 w-[70%] mx-auto text-white rounded-lg p-5 "
+      >
         {" "}
         Create a new collection
       </button>
@@ -146,27 +162,100 @@ const Sidebar = () => {
       <div className="flex flex-col gap-4 ">
         {collection?.map((c, colId) => (
           <div key={colId} className="flex flex-col">
-            <div  className="cursor-pointer select-none flex border mt-2 items-center">
-              {c?.isCollectionOpen ? <ChevronDown onClick={()=>toggleCollection(colId)} className="text-black" />  :<ChevronRight onClick={()=>toggleCollection(colId)} className="text-black" />} 
-              <p onDoubleClick={()=>changeCollectionName(colId)}>{c?.collectionName}</p>
+            <div className="cursor-pointer select-none flex border mt-2 items-center">
+              {c?.isCollectionOpen ? (
+                <ChevronDown
+                  onClick={() => toggleCollection(c?.id)}
+                  className="text-black"
+                />
+              ) : (
+                <ChevronRight
+                  onClick={() => toggleCollection(c?.id)}
+                  className="text-black"
+                />
+              )}
+              {c?.isEditing ? (
+                <input
+                  autoFocus
+                  className="border rounded px-2 py-1 w-full"
+                  defaultValue={c.collectionName}
+                  onBlur={(e) => saveCollectionName(c?.id, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      saveCollectionName(c?.id, e.currentTarget.value);
+                    }
+                  }}
+                />
+              ) : (
+                <p
+                  onDoubleClick={() => changeCollectionName(c?.id)}
+                  className="w-full px-4 flex justify-between items-center"
+                >
+                  {c?.collectionName}{" "}
+                  <span title="Add folder">
+                    {" "}
+                    <Plus className="text-blue-400" />
+                  </span>
+                </p>
+              )}
             </div>
             {c?.isCollectionOpen && c?.hasFolder?.length ? (
               <div className="flex flex-col">
                 {c?.hasFolder?.map((fol, folIndex) => (
-                  <div
-                    key={folIndex}
-                    className="flex flex-col border flex-col pl-4 "
-                  >
+                  <div key={folIndex} className="flex flex-col border pl-4 ">
                     <div className=" cursor-pointer flex gap-4 items-center py-3">
-                      {fol?.isFolderOpen ? <ChevronDown onClick={()=>toggleFolder( colId,folIndex)} className="text-black" />  :<ChevronRight onClick={()=>toggleFolder( colId,folIndex)} className="text-black" />} 
+                      {fol?.isFolderOpen ? (
+                        <ChevronDown
+                          onClick={() => toggleFolder(c?.id, fol?.folderId)}
+                          className="text-black"
+                        />
+                      ) : (
+                        <ChevronRight
+                          onClick={() => toggleFolder(c?.id, fol?.folderId)}
+                          className="text-black"
+                        />
+                      )}
                       <Folder className="text-black" />
-                      <p>{fol?.folderName}</p>
+                      {fol?.isEditing ? (
+                        <input
+                          autoFocus
+                          className="border rounded px-2 py-1 w-full"
+                          defaultValue={fol.folderName}
+                          onBlur={(e) =>
+                            saveFolderName(c?.id, fol?.folderId, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              saveFolderName(
+                                c?.id,
+                                fol?.folderId,
+                                e.currentTarget.value
+                              );
+                            }
+                          }}
+                        />
+                      ) : (
+                        <p
+                          onDoubleClick={() =>
+                            changeFolderName(c?.id, fol?.folderId)
+                          }
+                          className="w-full px-4 flex justify-between items-center"
+                        >
+                          {fol?.folderName}{" "}
+                          <span title="Add Request">
+                            {" "}
+                            <Plus className="text-blue-400" />
+                          </span>
+                        </p>
+                      )}
                     </div>
                     {fol?.isFolderOpen && fol?.hasRequests?.length ? (
                       <div className="flex flex-col">
                         {fol?.hasRequests?.map((req, reqId) => (
                           <div key={reqId} className="flex gap-4 border-2">
-                            <p className={methodColors[req?.method]}>{req?.method}</p>
+                            <p className={methodColors[req?.method]}>
+                              {req?.method}
+                            </p>
                             <p>{req?.reqName}</p>
                           </div>
                         ))}
