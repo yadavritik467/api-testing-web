@@ -4,10 +4,8 @@ import axios from "axios";
 
 const Home = () => {
   const [method, setMethod] = useState("GET");
-  const [baseUrl ,setBaseUrl] = useState(
-    "https://dummyjson.com/products"
-  );
-  const [finalUrl ,setFinalUrl] = useState(baseUrl);
+  const [baseUrl, setBaseUrl] = useState("https://dummyjson.com/products");
+  const [finalUrl, setFinalUrl] = useState(baseUrl);
   const [activeTab, setActiveTab] = useState("params");
   const [params, setParams] = useState<
     { key: string; value: string; enabled: boolean }[]
@@ -27,7 +25,7 @@ const Home = () => {
   ]);
   const [body, setBody] = useState("");
 
-  const [showResponse, setShowResponse] = useState<any>({});
+  const [showResponse, setShowResponse] = useState<any>(null);
 
   const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
@@ -67,16 +65,14 @@ const Home = () => {
     setHeaders(newHeaders);
   };
 
-
   const generateParamsUrl = () => {
-  const activeParams = params
-    .filter(p => p?.enabled && p.key.trim() !== "")
-    .map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
-    .join("&");
+    const activeParams = params
+      .filter((p) => p?.enabled && p.key.trim() !== "")
+      .map((p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
+      .join("&");
 
-  return activeParams ? `${baseUrl}?${activeParams}` : baseUrl;
-};
-
+    return activeParams ? `${baseUrl}?${activeParams}` : baseUrl;
+  };
 
   useEffect(() => {
     if (headers) {
@@ -89,23 +85,22 @@ const Home = () => {
   }, [headers]);
 
   useEffect(() => {
-  const updated = generateParamsUrl();
-  setFinalUrl(updated);
-}, [params, baseUrl]);
+    const updated = generateParamsUrl();
+    setFinalUrl(updated);
+  }, [params, baseUrl]);
 
   const GetMethod = async () => {
     try {
-      const { data } = await axios.get(
-        finalUrl,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...formattedHeaders,
-          },
-        }
-      );
-
-      setShowResponse(data);
+      const start = performance.now();
+      const data = await axios.get(finalUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          ...formattedHeaders,
+        },
+      });
+      const end = performance.now();
+      const duration = end - start;
+      setShowResponse({ ...data, time: Math.round(duration) });
     } catch (error: any) {
       // console.log("error", error);
       setShowResponse(error?.response?.data);
@@ -115,7 +110,7 @@ const Home = () => {
   const PostMethod = async () => {
     try {
       const parse = JSON.parse(body);
-      const { data } = await axios.post(
+      const data = await axios.post(
         finalUrl,
         {
           ...parse,
@@ -138,7 +133,7 @@ const Home = () => {
   const PutMethod = async () => {
     try {
       const parse = JSON.parse(body);
-      const { data } = await axios.put(
+      const data = await axios.put(
         finalUrl,
         {
           ...parse,
@@ -161,7 +156,7 @@ const Home = () => {
   const PatchMethod = async () => {
     try {
       const parse = JSON.parse(body);
-      const { data } = await axios.patch(
+      const data = await axios.patch(
         finalUrl,
         {
           ...parse,
@@ -183,7 +178,7 @@ const Home = () => {
 
   const DeleteMethod = async () => {
     try {
-      const { data } = await axios.delete(finalUrl ,{
+      const data = await axios.delete(finalUrl, {
         headers: {
           "Content-Type": "application/json",
           ...formattedHeaders,
@@ -213,6 +208,73 @@ const Home = () => {
     } else if (method === "DELETE") {
       DeleteMethod();
       return;
+    }
+  };
+
+  const formatTime = (ms: number) => {
+  if (!ms) return "";
+  
+  if (ms < 1000) return `${Math.round(ms)} ms`;
+  return `${(ms / 1000).toFixed(2)} s`;
+};
+
+  const getStatusInfo = (status: number) => {
+    switch (status) {
+      case 200:
+        return {
+          label: "Success",
+          bg: "bg-green-100",
+          text: "text-green-700",
+        };
+
+      case 201:
+        return {
+          label: "Created",
+          bg: "bg-green-100",
+          text: "text-green-700",
+        };
+
+      case 301:
+        return {
+          label: "Redirect",
+          bg: "bg-yellow-100",
+          text: "text-yellow-700",
+        };
+
+      case 400:
+        return {
+          label: "Bad Request",
+          bg: "bg-orange-100",
+          text: "text-orange-700",
+        };
+
+      case 404:
+        return {
+          label: "Not Found",
+          bg: "bg-orange-100",
+          text: "text-orange-700",
+        };
+
+      case 500:
+        return {
+          label: "Server Error",
+          bg: "bg-red-100",
+          text: "text-red-700",
+        };
+
+      case 503:
+        return {
+          label: "Service Unavailable",
+          bg: "bg-red-100",
+          text: "text-red-700",
+        };
+
+      default:
+        return {
+          label: "Unknown Status",
+          bg: "bg-gray-200",
+          text: "text-gray-700",
+        };
     }
   };
 
@@ -459,18 +521,38 @@ const Home = () => {
 
         {/* Response Section */}
         {showResponse !== null ? (
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-all",
-              background: "#1e1e1e",
-              color: "white",
-              padding: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            {JSON.stringify(showResponse, null, 2)}
-          </pre>
+          <div className="w-full">
+           <div className="flex justify-end items-center gap-3">
+             <div
+              className={`px-3 my-3 w-fit py-1 flex gap-4 rounded-md border ${
+                getStatusInfo(showResponse?.status).bg
+              } ${getStatusInfo(showResponse?.status).text}`}
+            >
+              {showResponse?.status} {getStatusInfo(showResponse?.status).label}
+            </div>
+            <div
+              className={`px-3 my-3 w-fit py-1 gap-4 rounded-md border ${
+                getStatusInfo(showResponse?.status).bg
+              } ${getStatusInfo(showResponse?.status).text}`}
+            >
+              {formatTime(showResponse?.time)}
+            </div>
+           </div>
+            <pre
+              style={{
+                height: "600px",
+                overflow: "scroll",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+                background: "#1e1e1e",
+                color: "white",
+                padding: "10px",
+                borderRadius: "8px",
+              }}
+            >
+              {JSON.stringify(showResponse?.data, null, 2)}
+            </pre>
+          </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">

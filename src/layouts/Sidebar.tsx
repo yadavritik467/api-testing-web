@@ -1,18 +1,19 @@
 import { ChevronDown, ChevronRight, Folder, Plus } from "lucide-react";
 import { useState } from "react";
 
+interface Request {
+  reqId: number;
+  reqName: string;
+  isEditing: boolean;
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  url: string;
+}
 interface Folder {
   folderId: number;
   folderName: string;
   isFolderOpen: boolean;
   isEditing: boolean;
-  hasRequests: {
-    reqId: number;
-    reqName: string;
-    isEditing: boolean;
-    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-    url: string;
-  }[];
+  hasRequests: Request[];
 }
 interface Collection {
   id: number;
@@ -109,6 +110,13 @@ const Sidebar = () => {
     }));
   };
 
+  const toggleCollection = (colId: number) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      isCollectionOpen: !c?.isCollectionOpen,
+    }));
+  };
+
   // folder logic
   const updateFolders = (
     colId: number,
@@ -120,6 +128,30 @@ const Sidebar = () => {
       hasFolder: c?.hasFolder.map((f) =>
         f?.folderId === folderId ? fn(f) : f
       ),
+    }));
+  };
+
+  const addFolder = (colId: number) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      hasFolder: [
+        ...c?.hasFolder,
+        {
+          isEditing: false,
+          folderId: c?.hasFolder?.length + 1,
+          folderName: "New Request",
+          isFolderOpen: false,
+          hasRequests: [
+            {
+              reqId: 0,
+              isEditing: false,
+              reqName: "New Request",
+              method: "GET",
+              url: "",
+            },
+          ],
+        },
+      ],
     }));
   };
   const changeFolderName = (colId: number, folderId: number) => {
@@ -137,16 +169,65 @@ const Sidebar = () => {
     }));
   };
 
-  const toggleCollection = (colId: number) => {
-    updateCollection(colId, (c) => ({
-      ...c,
-      isCollectionOpen: !c?.isCollectionOpen,
-    }));
-  };
   const toggleFolder = (colId: number, folderId: number) => {
     updateFolders(colId, folderId, (f) => ({
       ...f,
       isFolderOpen: !f?.isFolderOpen,
+    }));
+  };
+
+  // request logic
+  const updateRequest = (
+    colId: number,
+    folderId: number,
+    requestId: number,
+    fn: (r: Request) => Request
+  ) => {
+    updateFolders(colId, folderId, (f) => ({
+      ...f,
+      hasRequests: f.hasRequests?.map((r) =>
+        r?.reqId === requestId ? fn(r) : r
+      ),
+    }));
+  };
+
+  const addRequest = (colId: number, folderId: number) => {
+    updateFolders(colId, folderId, (f) => ({
+      ...f,
+      hasRequests: [
+        ...f?.hasRequests,
+        {
+          isEditing: false,
+          method: "GET",
+          reqId: f?.hasRequests?.length + 1,
+          reqName: "New Request",
+          url: "",
+        },
+      ],
+    }));
+  };
+
+  const changeRequestName = (
+    colId: number,
+    folderId: number,
+    requestId: number
+  ) => {
+    updateRequest(colId, folderId, requestId, (r) => ({
+      ...r,
+      isEditing: r?.isEditing === true ? false : true,
+    }));
+  };
+
+  const saveRequestName = (
+    colId: number,
+    folderId: number,
+    requestId: number,
+    val: string
+  ) => {
+    updateRequest(colId, folderId, requestId, (r) => ({
+      ...r,
+      reqName: val,
+      isEditing: false,
     }));
   };
   return (
@@ -192,7 +273,7 @@ const Sidebar = () => {
                   className="w-full px-4 flex justify-between items-center"
                 >
                   {c?.collectionName}{" "}
-                  <span title="Add folder">
+                  <span onClick={() => addFolder(c?.id)} title="Add folder">
                     {" "}
                     <Plus className="text-blue-400" />
                   </span>
@@ -242,7 +323,10 @@ const Sidebar = () => {
                           className="w-full px-4 flex justify-between items-center"
                         >
                           {fol?.folderName}{" "}
-                          <span title="Add Request">
+                          <span
+                            onClick={() => addRequest(c?.id, fol?.folderId)}
+                            title="Add Request"
+                          >
                             {" "}
                             <Plus className="text-blue-400" />
                           </span>
@@ -253,10 +337,47 @@ const Sidebar = () => {
                       <div className="flex flex-col">
                         {fol?.hasRequests?.map((req, reqId) => (
                           <div key={reqId} className="flex gap-4 border-2">
-                            <p className={methodColors[req?.method]}>
+                            <p  className={methodColors[req?.method]}>
                               {req?.method}
                             </p>
-                            <p>{req?.reqName}</p>
+                            {req?.isEditing ? (
+                              <input
+                                autoFocus
+                                className="border rounded px-2 py-1 w-full"
+                                defaultValue={req?.reqName}
+                                onBlur={(e) =>
+                                  saveRequestName(
+                                    c?.id,
+                                    fol?.folderId,
+                                    req?.reqId,
+                                    e.target.value
+                                  )
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    saveRequestName(
+                                      c?.id,
+                                      fol?.folderId,
+                                      req?.reqId,
+                                      e.currentTarget.value
+                                    );
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <p
+                                onDoubleClick={() =>
+                                  changeRequestName(
+                                    c?.id,
+                                    fol?.folderId,
+                                    req?.reqId
+                                  )
+                                }
+                                className="cursor-pointer"
+                              >
+                                {req?.reqName}
+                              </p>
+                            )}
                           </div>
                         ))}
                       </div>
