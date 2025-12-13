@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Send, Plus, X } from "lucide-react";
 import axios from "axios";
+import Editor from "@monaco-editor/react";
+import { Resizable } from "react-resizable";
 
 const Home = () => {
+  const [editorHeight, setEditorHeight] = useState(300); // px
   const [method, setMethod] = useState("GET");
   const [baseUrl, setBaseUrl] = useState("https://dummyjson.com/products");
   const [finalUrl, setFinalUrl] = useState(baseUrl);
@@ -24,7 +27,6 @@ const Home = () => {
     },
   ]);
   const [body, setBody] = useState("");
-
   const [showResponse, setShowResponse] = useState<any>(null);
 
   const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
@@ -212,11 +214,11 @@ const Home = () => {
   };
 
   const formatTime = (ms: number) => {
-  if (!ms) return "";
-  
-  if (ms < 1000) return `${Math.round(ms)} ms`;
-  return `${(ms / 1000).toFixed(2)} s`;
-};
+    if (!ms) return "";
+
+    if (ms < 1000) return `${Math.round(ms)} ms`;
+    return `${(ms / 1000).toFixed(2)} s`;
+  };
 
   const getStatusInfo = (status: number) => {
     switch (status) {
@@ -276,6 +278,10 @@ const Home = () => {
           text: "text-gray-700",
         };
     }
+  };
+
+  const handleEditorChange = (value: string) => {
+    setBody(value);
   };
 
   return (
@@ -507,14 +513,21 @@ const Home = () => {
 
             {/* Body Tab */}
             {activeTab === "body" && (
-              <div>
-                <textarea
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  placeholder="Enter request body (JSON, XML, etc.)"
-                  className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                />
-              </div>
+              <Resizable
+                height={editorHeight}
+                width={600}
+                onResize={(e, data) => setEditorHeight(data.size.height)}
+                resizeHandles={["s"]} 
+              >
+                <div style={{ height: editorHeight }}>
+                  <Editor
+                    height="100%"
+                    defaultLanguage="json"
+                    defaultValue={body}
+                    onChange={handleEditorChange}
+                  />
+                </div>
+              </Resizable>
             )}
           </div>
         </div>
@@ -522,22 +535,23 @@ const Home = () => {
         {/* Response Section */}
         {showResponse !== null ? (
           <div className="w-full">
-           <div className="flex justify-end items-center gap-3">
-             <div
-              className={`px-3 my-3 w-fit py-1 flex gap-4 rounded-md border ${
-                getStatusInfo(showResponse?.status).bg
-              } ${getStatusInfo(showResponse?.status).text}`}
-            >
-              {showResponse?.status} {getStatusInfo(showResponse?.status).label}
+            <div className="flex justify-end items-center gap-3">
+              <div
+                className={`px-3 my-3 w-fit py-1 flex gap-4 rounded-md border ${
+                  getStatusInfo(showResponse?.status).bg
+                } ${getStatusInfo(showResponse?.status).text}`}
+              >
+                {showResponse?.status}{" "}
+                {getStatusInfo(showResponse?.status).label}
+              </div>
+              <div
+                className={`px-3 my-3 w-fit py-1 gap-4 rounded-md border ${
+                  getStatusInfo(showResponse?.status).bg
+                } ${getStatusInfo(showResponse?.status).text}`}
+              >
+                {formatTime(showResponse?.time)}
+              </div>
             </div>
-            <div
-              className={`px-3 my-3 w-fit py-1 gap-4 rounded-md border ${
-                getStatusInfo(showResponse?.status).bg
-              } ${getStatusInfo(showResponse?.status).text}`}
-            >
-              {formatTime(showResponse?.time)}
-            </div>
-           </div>
             <pre
               style={{
                 height: "600px",
