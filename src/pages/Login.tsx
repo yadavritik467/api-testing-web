@@ -3,8 +3,9 @@ import { AiFillEye } from "react-icons/ai";
 import { IoIosEyeOff } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 // import { chatbot_front_url } from "../AppUrl";
-import axiosInstance from "../interceptor/interceptor";
+// import axiosInstance from "../interceptor/interceptor";
 import Loader from "../ui/Loader";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axiosInstance.post("/api/v1/srop-login", {
+      const { data } = await axios.post("/api/v1/srop-login", {
         email,
         password,
       });

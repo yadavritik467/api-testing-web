@@ -516,7 +516,7 @@ const Home = () => {
               <Resizable
                 height={editorHeight}
                 width={600}
-                onResize={(e, data) => setEditorHeight(data.size.height)}
+                onResize={(_, data) => setEditorHeight(data.size.height)}
                 resizeHandles={["s"]} 
               >
                 <div style={{ height: editorHeight }}>
@@ -524,7 +524,7 @@ const Home = () => {
                     height="100%"
                     defaultLanguage="json"
                     defaultValue={body}
-                    onChange={handleEditorChange}
+                    onChange={(val:string|undefined)=>handleEditorChange(val ?? "")}
                   />
                 </div>
               </Resizable>

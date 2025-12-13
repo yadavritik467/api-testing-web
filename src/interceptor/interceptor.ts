@@ -1,11 +1,11 @@
-import axios, { AxiosResponse } from "axios";
-import { toast } from "react-toastify";
-import { AppURl } from "../AppUrl";
+// import axios, { AxiosResponse } from "axios";
+// import { toast } from "react-toastify";
+// import { AppURl } from "../AppUrl";
 
-const axiosInstance = axios.create({
-  baseURL: AppURl,
-  withCredentials: true,
-});
+// const axiosInstance = axios.create({
+//   baseURL: AppURl,
+//   withCredentials: true,
+// });
 
 // axiosInstance.interceptors.request.use(
 //   (config: InternalAxiosRequestConfig<any>) => {
@@ -24,26 +24,26 @@ const axiosInstance = axios.create({
 //   }
 // );
 
-axiosInstance.interceptors.response.use(
-  (response: AxiosResponse<any, any>) => {
-    const method = response?.config?.method?.toUpperCase(); // Get HTTP method
-    if (
-      method === "POST" ||
-      method === "DELETE" ||
-      method === "PUT" ||
-      method === "PATCH"
-    ) {
-      toast.success(response?.data?.message, { autoClose: 1000 });
-    }
+// axiosInstance.interceptors.response.use(
+//   (response: AxiosResponse<any, any>) => {
+//     const method = response?.config?.method?.toUpperCase(); // Get HTTP method
+//     if (
+//       method === "POST" ||
+//       method === "DELETE" ||
+//       method === "PUT" ||
+//       method === "PATCH"
+//     ) {
+//       toast.success(response?.data?.message, { autoClose: 1000 });
+//     }
 
-    return response;
-  },
-  (error) => {
-    if (error?.config?.url !== "/myProfile") {
-      toast.error(error?.response?.data?.message, { autoClose: 3000 });
-    }
-    return Promise.reject(error);
-  }
-);
+//     return response;
+//   },
+//   (error) => {
+//     if (error?.config?.url !== "/myProfile") {
+//       toast.error(error?.response?.data?.message, { autoClose: 3000 });
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
-export default axiosInstance;
+// export default axiosInstance;

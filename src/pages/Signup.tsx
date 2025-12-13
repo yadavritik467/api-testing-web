@@ -2,8 +2,9 @@ import { useState } from "react";
 import { AiFillEye } from "react-icons/ai";
 import { IoIosEyeOff } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../interceptor/interceptor";
+// import axiosInstance from "../interceptor/interceptor";
 import Loader from "../ui/Loader";
+import axios from "axios";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -19,7 +20,7 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axiosInstance.post("/api/v1/srop-signup", {
+      const { data } = await axios.post("/api/v1/srop-signup", {
         name,
         email,
         password,
