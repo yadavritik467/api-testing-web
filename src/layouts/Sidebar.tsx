@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Folder, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Request {
   reqId: number;
@@ -32,31 +32,50 @@ const Sidebar = () => {
     DELETE: "text-red-500",
   };
 
-  const [collection, setCollection] = useState<Collection[]>([
-    {
-      id: 0,
-      isCollectionOpen: true,
-      isEditing: false,
-      collectionName: "New Collection",
-      hasFolder: [
+  const [collection, setCollection] = useState<Collection[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("collection");
+    if (stored) {
+      const parsed = JSON.parse(stored) as Collection[];
+      setCollection(parsed);
+      return;
+    } else {
+      const collecArr = [
         {
-          folderId: 0,
-          folderName: "New Folder",
-          isFolderOpen: true,
+          id: 0,
+          isCollectionOpen: true,
           isEditing: false,
-          hasRequests: [
+          collectionName: "New Collection",
+          hasFolder: [
             {
-              reqId: 0,
+              folderId: 0,
+              folderName: "New Folder",
+              isFolderOpen: true,
               isEditing: false,
-              reqName: "New Request",
-              method: "GET",
-              url: "",
+              hasRequests: [
+                {
+                  reqId: 0,
+                  isEditing: false,
+                  reqName: "New Request",
+                  method: "GET",
+                  url: "",
+                },
+              ],
             },
           ],
         },
-      ],
-    },
-  ]);
+      ];
+      setCollection(collecArr as Collection[]);
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (collection?.length) {
+      localStorage.setItem("collection", JSON.stringify(collection));
+    }
+  }, [collection]);
 
   const createCollection = () => {
     setCollection((p) => [
@@ -337,7 +356,7 @@ const Sidebar = () => {
                       <div className="flex flex-col">
                         {fol?.hasRequests?.map((req, reqId) => (
                           <div key={reqId} className="flex gap-4 border-2">
-                            <p  className={methodColors[req?.method]}>
+                            <p className={methodColors[req?.method]}>
                               {req?.method}
                             </p>
                             {req?.isEditing ? (
