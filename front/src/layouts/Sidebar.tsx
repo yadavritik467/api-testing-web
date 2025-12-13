@@ -250,34 +250,43 @@ const Sidebar = () => {
     }));
   };
   return (
-    <div className="w-full bg-gray-50 flex flex-col border h-[100vh] overflow-y-scroll">
-      <button
-        onClick={createCollection}
-        className="bg-blue-600 hover:bg-blue-700 mt-4 w-[70%] mx-auto text-white rounded-lg p-5 "
-      >
-        {" "}
-        Create a new collection
-      </button>
+    <div className="w-full bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col h-[100vh] overflow-hidden">
+      {/* Header Section */}
+      <div className="p-6 bg-white border-b border-slate-200 shadow-sm">
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Collections</h2>
+        <button
+          onClick={createCollection}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 w-full text-white rounded-lg p-3 font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          <Plus className="w-5 h-5" />
+          Create New Collection
+        </button>
+      </div>
 
-      <div className="flex flex-col gap-4 ">
+      {/* Collections List */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {collection?.map((c, colId) => (
-          <div key={colId} className="flex flex-col">
-            <div className="cursor-pointer select-none flex border mt-2 items-center">
-              {c?.isCollectionOpen ? (
-                <ChevronDown
-                  onClick={() => toggleCollection(c?.id)}
-                  className="text-black"
-                />
-              ) : (
-                <ChevronRight
-                  onClick={() => toggleCollection(c?.id)}
-                  className="text-black"
-                />
-              )}
+          <div
+            key={colId}
+            className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+          >
+            {/* Collection Header */}
+            <div className="cursor-pointer select-none flex items-center p-3 hover:bg-slate-50 transition-colors duration-150">
+              <button
+                onClick={() => toggleCollection(c?.id)}
+                className="mr-2 p-1 hover:bg-slate-200 rounded transition-colors"
+              >
+                {c?.isCollectionOpen ? (
+                  <ChevronDown className="text-slate-600 w-5 h-5" />
+                ) : (
+                  <ChevronRight className="text-slate-600 w-5 h-5" />
+                )}
+              </button>
+
               {c?.isEditing ? (
                 <input
                   autoFocus
-                  className="border rounded px-2 py-1 w-full"
+                  className="border border-blue-300 rounded-lg px-3 py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   defaultValue={c.collectionName}
                   onBlur={(e) => saveCollectionName(c?.id, e.target.value)}
                   onKeyDown={(e) => {
@@ -287,39 +296,54 @@ const Sidebar = () => {
                   }}
                 />
               ) : (
-                <p
+                <div
                   onDoubleClick={() => changeCollectionName(c?.id)}
-                  className="w-full px-4 flex justify-between items-center"
+                  className="w-full flex justify-between items-center group"
                 >
-                  {c?.collectionName}{" "}
-                  <span onClick={() => addFolder(c?.id)} title="Add folder">
-                    {" "}
-                    <Plus className="text-blue-400" />
-                  </span>
-                </p>
+                  <p className="font-semibold text-slate-700 flex-1">
+                    {c?.collectionName}
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addFolder(c?.id);
+                    }}
+                    title="Add folder"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
+                  >
+                    <Plus className="text-blue-600 w-4 h-4" />
+                  </button>
+                </div>
               )}
             </div>
+
+            {/* Folders */}
             {c?.isCollectionOpen && c?.hasFolder?.length ? (
-              <div className="flex flex-col">
+              <div className="border-t border-slate-100">
                 {c?.hasFolder?.map((fol, folIndex) => (
-                  <div key={folIndex} className="flex flex-col border pl-4 ">
-                    <div className=" cursor-pointer flex gap-4 items-center py-3">
-                      {fol?.isFolderOpen ? (
-                        <ChevronDown
-                          onClick={() => toggleFolder(c?.id, fol?.folderId)}
-                          className="text-black"
-                        />
-                      ) : (
-                        <ChevronRight
-                          onClick={() => toggleFolder(c?.id, fol?.folderId)}
-                          className="text-black"
-                        />
-                      )}
-                      <Folder className="text-black" />
+                  <div
+                    key={folIndex}
+                    className="border-b last:border-b-0 border-slate-100"
+                  >
+                    {/* Folder Header */}
+                    <div className="cursor-pointer flex items-center py-2.5 px-3 pl-8 hover:bg-slate-50 transition-colors duration-150 group">
+                      <button
+                        onClick={() => toggleFolder(c?.id, fol?.folderId)}
+                        className="mr-2 p-1 hover:bg-slate-200 rounded transition-colors"
+                      >
+                        {fol?.isFolderOpen ? (
+                          <ChevronDown className="text-slate-500 w-4 h-4" />
+                        ) : (
+                          <ChevronRight className="text-slate-500 w-4 h-4" />
+                        )}
+                      </button>
+
+                      <Folder className="text-blue-500 w-4 h-4 mr-2" />
+
                       {fol?.isEditing ? (
                         <input
                           autoFocus
-                          className="border rounded px-2 py-1 w-full"
+                          className="border border-blue-300 rounded-lg px-3 py-1 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           defaultValue={fol.folderName}
                           onBlur={(e) =>
                             saveFolderName(c?.id, fol?.folderId, e.target.value)
@@ -335,34 +359,49 @@ const Sidebar = () => {
                           }}
                         />
                       ) : (
-                        <p
+                        <div
                           onDoubleClick={() =>
                             changeFolderName(c?.id, fol?.folderId)
                           }
-                          className="w-full px-4 flex justify-between items-center"
+                          className="w-full flex justify-between items-center"
                         >
-                          {fol?.folderName}{" "}
-                          <span
-                            onClick={() => addRequest(c?.id, fol?.folderId)}
+                          <p className="text-sm font-medium text-slate-600 flex-1">
+                            {fol?.folderName}
+                          </p>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addRequest(c?.id, fol?.folderId);
+                            }}
                             title="Add Request"
+                            className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
                           >
-                            {" "}
-                            <Plus className="text-blue-400" />
-                          </span>
-                        </p>
+                            <Plus className="text-blue-600 w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       )}
                     </div>
+
+                    {/* Requests */}
                     {fol?.isFolderOpen && fol?.hasRequests?.length ? (
-                      <div className="flex flex-col">
+                      <div className="bg-slate-50">
                         {fol?.hasRequests?.map((req, reqId) => (
-                          <div key={reqId} className="flex gap-4 border-2">
-                            <p className={methodColors[req?.method]}>
+                          <div
+                            key={reqId}
+                            className="flex items-center gap-3 py-2 px-3 pl-16 hover:bg-white border-b last:border-b-0 border-slate-200 transition-colors duration-150 cursor-pointer group"
+                          >
+                            <span
+                              className={`${
+                                methodColors[req?.method]
+                              } font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
+                            >
                               {req?.method}
-                            </p>
+                            </span>
+
                             {req?.isEditing ? (
                               <input
                                 autoFocus
-                                className="border rounded px-2 py-1 w-full"
+                                className="border border-blue-300 rounded-lg px-3 py-1 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                                 defaultValue={req?.reqName}
                                 onBlur={(e) =>
                                   saveRequestName(
@@ -392,7 +431,7 @@ const Sidebar = () => {
                                     req?.reqId
                                   )
                                 }
-                                className="cursor-pointer"
+                                className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors"
                               >
                                 {req?.reqName}
                               </p>
