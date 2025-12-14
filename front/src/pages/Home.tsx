@@ -1,33 +1,45 @@
 import { useEffect, useState } from "react";
 import { Send, Plus, X } from "lucide-react";
-import axios from "axios";
 import Editor from "@monaco-editor/react";
 import { Resizable } from "react-resizable";
+import { KeyValueItem, useCollection } from "../context/Collection";
+import { methodColors1 } from "../layouts/Sidebar";
 
 const Home = () => {
-  const [editorHeight, setEditorHeight] = useState(300); // px
-  const [method, setMethod] = useState("GET");
-  const [baseUrl, setBaseUrl] = useState("https://dummyjson.com/products");
-  const [finalUrl, setFinalUrl] = useState(baseUrl);
-  const [activeTab, setActiveTab] = useState("params");
-  const [params, setParams] = useState<
-    { key: string; value: string; enabled: boolean }[]
-  >([{ key: "", value: "", enabled: false }]);
+  const {
+    // states,
+    method,
+    baseUrl,
+    finalUrl,
+    activeTab,
+    params,
+    formData,
+    headers,
+    body,
+    showResponse,
+    bodyMode,
 
-  const [formattedHeaders, setFormattedHeaders] = useState<any>({});
-  const [headers, setHeaders] = useState<
-    { key: string; value: string; enabled: boolean }[]
-  >([
-    { key: "Content-Type", value: "application/json", enabled: true },
-    {
-      key: "Authorization",
-      value:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0MDRmMTc4Yy04NGIyLTQxZGItODA3Ni03MThlY2Y3ODRiYzkiLCJuYW1lIjoicml0aWsgc2VydmljZWhpdmUiLCJ1c2VybmFtZSI6InlhZGF2cml0aWs0NDUiLCJpYXQiOjE3NjUyMDcyMjcsImV4cCI6MTc2NTI5MzYyN30.YRGy0g006-m4QfqpRK2FBuwIXGJyhiz9liXmO4dNxQg",
-      enabled: true,
-    },
-  ]);
-  const [body, setBody] = useState("");
-  const [showResponse, setShowResponse] = useState<any>(null);
+    // states update func
+    setMethod,
+    setBaseUrl,
+    setFinalUrl,
+    setActiveTab,
+    setParams,
+    setFormData,
+    setFormattedHeaders,
+    setHeaders,
+    setBody,
+    setBodyMode,
+
+    // apis handler
+
+    GetMethod,
+    PostMethod,
+    PutMethod,
+    PatchMethod,
+    DeleteMethod,
+  } = useCollection();
+  const [editorHeight, setEditorHeight] = useState(300); // px
 
   const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
@@ -39,38 +51,79 @@ const Home = () => {
     DELETE: "bg-red-500 hover:bg-red-600",
   };
 
+  // parmas logic
   const addParam = () => {
-    setParams([...params, { key: "", value: "", enabled: true }]);
+    setParams([...params, { key: "", value: "", enabled: false }]);
   };
 
   const removeParam = (index: number) => {
-    setParams(params.filter((_, i) => i !== index));
+    setParams(params.filter((_: any, i: number) => i !== index));
   };
 
-  const updateParam = (index: number, field: string, value: any) => {
-    const newParams: any = [...params];
-    newParams[index][field] = value;
-    setParams(newParams);
+  const updateParam = (
+    index: number,
+    field: string,
+    value: string | boolean
+  ) => {
+    setParams((prev: typeof params) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
   };
 
+  // header logic
   const addHeader = () => {
-    setHeaders([...headers, { key: "", value: "", enabled: true }]);
+    setHeaders([...headers, { key: "", value: "", enabled: false }]);
   };
 
   const removeHeader = (index: number) => {
-    setHeaders(headers.filter((_, i) => i !== index));
+    setHeaders(headers.filter((_: any, i: number) => i !== index));
   };
 
-  const updateHeader = (index: number, field: string, value: any) => {
-    const newHeaders: any[] = [...headers];
-    newHeaders[index][field] = value;
-    setHeaders(newHeaders);
+  const updateHeader = (
+    index: number,
+    field: string,
+    value: string | boolean
+  ) => {
+    setHeaders((prev: KeyValueItem[]) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
   };
+
+  // form data logic
+  const addFormData = () => {
+    setFormData([
+      ...formData,
+      { type: "text", key: "", value: "", enabled: false },
+    ]);
+  };
+
+  const removeFormData = (index: number) => {
+    setFormData(formData.filter((_: any, i: number) => i !== index));
+  };
+
+  const updateFormData = (index: number, field: string, value: any) => {
+    setFormData((prev: KeyValueItem[]) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  // generate and upate url in live thorough params
 
   const generateParamsUrl = () => {
     const activeParams = params
       .filter((p) => p?.enabled && p.key.trim() !== "")
-      .map((p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
+      .map(
+        (p) =>
+          `${encodeURIComponent(p?.key)}=${encodeURIComponent(
+            p?.value as string
+          )}`
+      )
       .join("&");
 
     return activeParams ? `${baseUrl}?${activeParams}` : baseUrl;
@@ -79,7 +132,7 @@ const Home = () => {
   useEffect(() => {
     if (headers) {
       const formatHeaders = headers.reduce((acc, item) => {
-        if (item?.enabled) acc[item.key] = item.value;
+        if (item?.enabled) acc[item.key] = String(item.value);
         return acc;
       }, {} as Record<string, string>);
       setFormattedHeaders(formatHeaders);
@@ -90,109 +143,6 @@ const Home = () => {
     const updated = generateParamsUrl();
     setFinalUrl(updated);
   }, [params, baseUrl]);
-
-  const GetMethod = async () => {
-    try {
-      const start = performance.now();
-      const data = await axios.get(finalUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          ...formattedHeaders,
-        },
-      });
-      const end = performance.now();
-      const duration = end - start;
-      setShowResponse({ ...data, time: Math.round(duration) });
-    } catch (error: any) {
-      // console.log("error", error);
-      setShowResponse(error?.response?.data);
-    }
-  };
-
-  const PostMethod = async () => {
-    try {
-      const parse = JSON.parse(body);
-      const data = await axios.post(
-        finalUrl,
-        {
-          ...parse,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...formattedHeaders,
-          },
-        }
-      );
-
-      setShowResponse(data);
-    } catch (error: any) {
-      // console.log("error", error);
-      setShowResponse(error?.response?.data);
-    }
-  };
-
-  const PutMethod = async () => {
-    try {
-      const parse = JSON.parse(body);
-      const data = await axios.put(
-        finalUrl,
-        {
-          ...parse,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...formattedHeaders,
-          },
-        }
-      );
-
-      setShowResponse(data);
-    } catch (error: any) {
-      // console.log("error", error);
-      setShowResponse(error?.response?.data);
-    }
-  };
-
-  const PatchMethod = async () => {
-    try {
-      const parse = JSON.parse(body);
-      const data = await axios.patch(
-        finalUrl,
-        {
-          ...parse,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...formattedHeaders,
-          },
-        }
-      );
-
-      setShowResponse(data);
-    } catch (error: any) {
-      // console.log("error", error);
-      setShowResponse(error?.response?.data);
-    }
-  };
-
-  const DeleteMethod = async () => {
-    try {
-      const data = await axios.delete(finalUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          ...formattedHeaders,
-        },
-      });
-
-      setShowResponse(data);
-    } catch (error: any) {
-      // console.log("error", error);
-      setShowResponse(error?.response?.data);
-    }
-  };
 
   const sendRequest = () => {
     if (method === "GET") {
@@ -283,7 +233,6 @@ const Home = () => {
   const handleEditorChange = (value: string) => {
     setBody(value);
   };
-
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -293,6 +242,32 @@ const Home = () => {
             API Testing
           </h1>
           <p className="text-gray-600 mt-1">Test your API endpoints</p>
+        </div>
+
+        <div className="w-[100%] overflow-x-scroll border h-[60px] flex ">
+          <div className={`w-[300px] bg-slate-200 h-full border cursor-pointer `}>
+            <div
+              key={"reqId"}
+              className="flex justify-start items-center gap-3 py-2 px-3 hover:bg-white border-b last:border-b-0 border-slate-200 transition-colors duration-150 cursor-pointer group"
+            >
+              <span
+                className={`${
+                  methodColors1["GET"]
+                } font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
+              >
+                GET
+              </span>
+
+               <p
+                  // onDoubleClick={() => changeRequestName()}
+                  className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors"
+                >
+                  new req
+                </p>
+
+              
+            </div>
+          </div>
         </div>
 
         {/* Main Request Builder */}
@@ -409,7 +384,7 @@ const Home = () => {
                           <td className="py-1 px-2">
                             <input
                               type="text"
-                              value={param.value}
+                              value={String(param.value)}
                               onChange={(e) =>
                                 updateParam(index, "value", e.target.value)
                               }
@@ -480,7 +455,7 @@ const Home = () => {
                           <td className="py-1 px-2">
                             <input
                               type="text"
-                              value={header.value}
+                              value={String(header.value)}
                               onChange={(e) =>
                                 updateHeader(index, "value", e.target.value)
                               }
@@ -513,21 +488,154 @@ const Home = () => {
 
             {/* Body Tab */}
             {activeTab === "body" && (
-              <Resizable
-                height={editorHeight}
-                width={600}
-                onResize={(_, data) => setEditorHeight(data.size.height)}
-                resizeHandles={["s"]} 
-              >
-                <div style={{ height: editorHeight }}>
-                  <Editor
-                    height="100%"
-                    defaultLanguage="json"
-                    defaultValue={body}
-                    onChange={(val:string|undefined)=>handleEditorChange(val ?? "")}
-                  />
+              <div className="flex flex-col w-full">
+                <div className="flex w-full">
+                  <button
+                    onClick={() => setBodyMode("raw")}
+                    className={`w-[50%] mb-4  ${
+                      bodyMode === "raw"
+                        ? "text-blue-600 border-r-2 border-b-2 border-blue-600"
+                        : "text-gray-600 hover:text-gray-800"
+                    }  `}
+                  >
+                    Raw
+                  </button>
+                  <button
+                    onClick={() => setBodyMode("formData")}
+                    className={`w-[50%] mb-4  ${
+                      bodyMode === "formData"
+                        ? "text-blue-600 border-l-2 border-b-2 border-blue-600"
+                        : "text-gray-600 hover:text-gray-800"
+                    }  `}
+                  >
+                    Form Data
+                  </button>
                 </div>
-              </Resizable>
+                {bodyMode === "raw" ? (
+                  <Resizable
+                    height={editorHeight}
+                    width={600}
+                    onResize={(_: any, data) =>
+                      setEditorHeight(data.size.height)
+                    }
+                    resizeHandles={["s"]}
+                  >
+                    <div style={{ height: editorHeight }}>
+                      <Editor
+                        height="100%"
+                        defaultLanguage="json"
+                        defaultValue={body}
+                        onChange={(val: string | undefined) =>
+                          handleEditorChange(val ?? "")
+                        }
+                      />
+                    </div>
+                  </Resizable>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="text-left text-sm text-gray-600">
+                            <th className="pb-2 w-8"></th>
+                            <th className="pb-2 px-2">type</th>
+                            <th className="pb-2 px-2">Key</th>
+                            <th className="pb-2 px-2">Value</th>
+                            <th className="pb-2 w-8"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {formData.map((fd, index) => (
+                            <tr key={index} className="group">
+                              <td className="py-1">
+                                <input
+                                  type="checkbox"
+                                  checked={fd.enabled}
+                                  onChange={(e) =>
+                                    updateFormData(
+                                      index,
+                                      "enabled",
+                                      e.target.checked
+                                    )
+                                  }
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                                />
+                              </td>
+                              <td className="py-1">
+                                <select
+                                  onChange={(e) =>
+                                    setFormData((prev) =>
+                                      prev.map((p, i: number) =>
+                                        i === index
+                                          ? {
+                                              ...p,
+                                              type: e.target.value as
+                                                | "text"
+                                                | "file",
+                                            }
+                                          : p
+                                      )
+                                    )
+                                  }
+                                  className="w-full px-4 py-2 bg-white cursor-pointer border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="text">Text</option>
+                                  <option value="file">File</option>
+                                </select>
+                              </td>
+                              <td className="py-1 px-2">
+                                <input
+                                  type="text"
+                                  value={fd.key}
+                                  onChange={(e) =>
+                                    updateFormData(index, "key", e.target.value)
+                                  }
+                                  placeholder="Key"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              </td>
+                              <td className="py-1 px-2">
+                                <input
+                                  type={fd?.type}
+                                  value={
+                                    fd?.type !== "file" ? String(fd?.value) : ""
+                                  }
+                                  onChange={(e) =>
+                                    updateFormData(
+                                      index,
+                                      "value",
+                                      fd?.type === "text"
+                                        ? String(e.target.value)
+                                        : e?.target?.files?.[0]
+                                    )
+                                  }
+                                  placeholder="Value"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              </td>
+                              <td className="py-1">
+                                <button
+                                  onClick={() => removeFormData(index)}
+                                  className="text-gray-400 hover:text-red-600 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <button
+                      onClick={addFormData}
+                      className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Form Data
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -538,18 +646,18 @@ const Home = () => {
             <div className="flex justify-end items-center gap-3">
               <div
                 className={`px-3 my-3 w-fit py-1 flex gap-4 rounded-md border ${
-                  getStatusInfo(showResponse?.status).bg
-                } ${getStatusInfo(showResponse?.status).text}`}
+                  getStatusInfo(showResponse?.status ?? -1)?.bg
+                } ${getStatusInfo(showResponse?.status ?? -1).text}`}
               >
                 {showResponse?.status}{" "}
-                {getStatusInfo(showResponse?.status).label}
+                {getStatusInfo(showResponse?.status ?? -1).label}
               </div>
               <div
                 className={`px-3 my-3 w-fit py-1 gap-4 rounded-md border ${
-                  getStatusInfo(showResponse?.status).bg
-                } ${getStatusInfo(showResponse?.status).text}`}
+                  getStatusInfo(showResponse?.status ?? -1).bg
+                } ${getStatusInfo(showResponse?.status ?? -1).text}`}
               >
-                {formatTime(showResponse?.time)}
+                {formatTime(showResponse?.time ?? -1)}
               </div>
             </div>
             <pre

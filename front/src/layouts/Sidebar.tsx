@@ -23,14 +23,16 @@ interface Collection {
   hasFolder: Folder[];
 }
 
-const Sidebar = () => {
-  const methodColors: { [key: string]: any } = {
+export const methodColors1: { [key: string]: any } = {
     GET: "text-green-500",
     POST: "text-yellow-500",
     PUT: "text-blue-500",
     PATCH: "text-purple-500",
     DELETE: "text-red-500",
   };
+
+const Sidebar = () => {
+  
 
   const [collection, setCollection] = useState<Collection[]>([]);
 
@@ -392,7 +394,7 @@ const Sidebar = () => {
                           >
                             <span
                               className={`${
-                                methodColors[req?.method]
+                                methodColors1[req?.method]
                               } font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
                             >
                               {req?.method}
