@@ -1,5 +1,6 @@
 import axios from "axios";
-import { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
+import { Request } from "../layouts/Sidebar";
 
 export interface KeyValueItem {
   type?: "text" | "file";
@@ -45,6 +46,7 @@ export interface CollectionContextType {
   body: string;
   showResponse: ApiResponse | null;
   bodyMode: "raw" | "formData";
+  requestArr: Request[];
    
   // update functions
   setMethod: React.Dispatch<React.SetStateAction<string>>;
@@ -58,6 +60,7 @@ export interface CollectionContextType {
   setBody: React.Dispatch<React.SetStateAction<string>>;
   setShowResponse: React.Dispatch<React.SetStateAction<ApiResponse | null>>;
   setBodyMode: React.Dispatch<React.SetStateAction<"raw" | "formData">>;
+  setRequestArr:React.Dispatch<React.SetStateAction<Request[]>>
 
   //api controller functions
   GetMethod: () => Promise<void>;
@@ -103,6 +106,8 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
   const [body, setBody] = useState("");
   const [showResponse, setShowResponse] = useState<any>(null);
   const [bodyMode, setBodyMode] = useState<"raw" | "formData">("raw");
+
+  const [requestArr,setRequestArr] =useState<Request[]>([])
 
 
 
@@ -228,6 +233,7 @@ const createFormData = () => {
     body,
     showResponse,
     bodyMode,
+    requestArr
   };
   const all_states_update_func = {
     setMethod,
@@ -241,6 +247,7 @@ const createFormData = () => {
     setBody,
     setShowResponse,
     setBodyMode,
+    setRequestArr
   };
 
   const all_api_controllers = {

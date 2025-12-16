@@ -1,21 +1,26 @@
 import { ChevronDown, ChevronRight, Folder, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useCollection } from "../context/Collection";
+import { useSearchParams } from "react-router-dom";
 
-interface Request {
+export type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export interface Request {
+  colId?: number;
+  folderId?: number;
   reqId: number;
   reqName: string;
   isEditing: boolean;
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method: RequestMethod
   url: string;
 }
-interface Folder {
+export interface Folder {
   folderId: number;
   folderName: string;
   isFolderOpen: boolean;
   isEditing: boolean;
   hasRequests: Request[];
 }
-interface Collection {
+export interface Collection {
   id: number;
   isCollectionOpen: boolean;
   isEditing: boolean;
@@ -24,17 +29,17 @@ interface Collection {
 }
 
 export const methodColors1: { [key: string]: any } = {
-    GET: "text-green-500",
-    POST: "text-yellow-500",
-    PUT: "text-blue-500",
-    PATCH: "text-purple-500",
-    DELETE: "text-red-500",
-  };
+  GET: "text-green-500",
+  POST: "text-yellow-500",
+  PUT: "text-blue-500",
+  PATCH: "text-purple-500",
+  DELETE: "text-red-500",
+};
 
 const Sidebar = () => {
-  
-
+  const { setRequestArr } = useCollection();
   const [collection, setCollection] = useState<Collection[]>([]);
+  const [_, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     const stored = localStorage.getItem("collection");
@@ -250,6 +255,35 @@ const Sidebar = () => {
       reqName: val,
       isEditing: false,
     }));
+    setRequestArr((prev) =>
+      prev.map((p) =>
+        p?.colId === colId && p?.folderId === folderId && p?.reqId === requestId
+          ? { ...p, reqName: val }
+          : p
+      )
+    );
+  };
+
+  const createReqTabArr = (
+    colId: number,
+    folderId: number,
+    request: Request
+  ) => {
+    setSearchParams({
+      colId: String(colId),
+      folderId: String(folderId),
+      reqId: String(request.reqId),
+    });
+    setRequestArr((prev) => {
+      const isExist = prev?.some(
+        (f) =>
+          f?.colId === colId &&
+          f?.folderId === folderId &&
+          f?.reqId === request?.reqId
+      );
+
+      return isExist ? prev : [...prev, { colId, folderId, ...request }];
+    });
   };
   return (
     <div className="w-full bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col h-[100vh] overflow-hidden">
@@ -432,6 +466,9 @@ const Sidebar = () => {
                                     fol?.folderId,
                                     req?.reqId
                                   )
+                                }
+                                onClick={() =>
+                                  createReqTabArr(c?.id, fol?.folderId, req)
                                 }
                                 className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors"
                               >

@@ -3,7 +3,8 @@ import { Send, Plus, X } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { Resizable } from "react-resizable";
 import { KeyValueItem, useCollection } from "../context/Collection";
-import { methodColors1 } from "../layouts/Sidebar";
+import { methodColors1, RequestMethod } from "../layouts/Sidebar";
+import { useSearchParams } from "react-router-dom";
 
 const Home = () => {
   const {
@@ -18,6 +19,7 @@ const Home = () => {
     body,
     showResponse,
     bodyMode,
+    requestArr,
 
     // states update func
     setMethod,
@@ -30,6 +32,7 @@ const Home = () => {
     setHeaders,
     setBody,
     setBodyMode,
+    setRequestArr,
 
     // apis handler
 
@@ -40,6 +43,11 @@ const Home = () => {
     DeleteMethod,
   } = useCollection();
   const [editorHeight, setEditorHeight] = useState(300); // px
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const CollectionId = Number(searchParams?.get("colId"));
+  const FolderID = Number(searchParams?.get("folderId"));
+  const RequestID = Number(searchParams?.get("reqId"));
 
   const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
@@ -244,31 +252,44 @@ const Home = () => {
           <p className="text-gray-600 mt-1">Test your API endpoints</p>
         </div>
 
-        <div className="w-[100%] overflow-x-scroll border h-[60px] flex ">
-          <div className={`w-[300px] bg-slate-200 h-full border cursor-pointer `}>
-            <div
-              key={"reqId"}
-              className="flex justify-start items-center gap-3 py-2 px-3 hover:bg-white border-b last:border-b-0 border-slate-200 transition-colors duration-150 cursor-pointer group"
-            >
-              <span
+        {requestArr?.length ? (
+          <div className="w-[100%] overflow-x-scroll border h-[60px] flex ">
+            {requestArr?.map((r, i) => (
+              <div
+                key={i}
+                onClick={() =>
+                  setSearchParams({
+                    colId: String(r?.colId),
+                    folderId: String(r?.folderId),
+                    reqId: String(r.reqId),
+                  })
+                }
                 className={`${
-                  methodColors1["GET"]
-                } font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
+                  r?.colId === CollectionId &&
+                  r?.folderId === FolderID &&
+                  r?.reqId === RequestID
+                    ? "bg-slate-200"
+                    : "bg-white"
+                } w-[300px] h-full border border-blue-200 cursor-pointer `}
               >
-                GET
-              </span>
+                <div className="flex justify-start items-center gap-3 py-2 px-3 border-b last:border-b-0 border-slate-200 transition-colors duration-150 cursor-pointer group">
+                  <span
+                    className={`${methodColors1["GET"]} font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
+                  >
+                    {r?.method}
+                  </span>
 
-               <p
-                  // onDoubleClick={() => changeRequestName()}
-                  className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors"
-                >
-                  new req
-                </p>
-
-              
-            </div>
+                  <p
+                    // onDoubleClick={() => changeRequestName()}
+                    className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors"
+                  >
+                    {r?.reqName}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        ) : null}
 
         {/* Main Request Builder */}
         <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
@@ -278,7 +299,20 @@ const Home = () => {
             <div className="relative">
               <select
                 value={method}
-                onChange={(e) => setMethod(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  setMethod(value);
+                  setRequestArr((prev) =>
+                    prev.map((p) =>
+                      p.colId === CollectionId &&
+                      p.folderId === FolderID &&
+                      p.reqId === RequestID
+                        ? { ...p, method: value as RequestMethod }
+                        : p
+                    )
+                  );
+                }}
                 className={`${methodColors[method]} text-white font-semibold px-4 py-3 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 appearance-none pr-10 w-full md:w-auto`}
               >
                 {methods.map((m) => (
