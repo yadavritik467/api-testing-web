@@ -3,6 +3,9 @@ name: Deploy Frontend to GitHub Pages
 on:
   push:
     branches: [main]
+    paths:
+      - "fornt/"
+      - ".github/workflows/front-deployment.yml"
   workflow_dispatch:
 
 permissions:
@@ -21,14 +24,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ( with npm cache)
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
+          cache: "npm"
+          cache-dependency-path: front/package-lock.json
+        
+      # npm ci is faster & deterministic
       - name: Install dependencies
         working-directory: front
-        run: npm install
+        run: npm ci 
 
       - name: Build frontend
         working-directory: front
