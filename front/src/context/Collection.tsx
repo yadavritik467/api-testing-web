@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import { Request } from "../layouts/Sidebar";
+import { Collection, Request } from "../layouts/Sidebar";
 
 export interface KeyValueItem {
   type?: "text" | "file";
@@ -47,7 +47,8 @@ export interface CollectionContextType {
   showResponse: ApiResponse | null;
   bodyMode: "raw" | "formData";
   requestArr: Request[];
-   
+  collection: Collection[];
+
   // update functions
   setMethod: React.Dispatch<React.SetStateAction<string>>;
   setBaseUrl: React.Dispatch<React.SetStateAction<string>>;
@@ -55,12 +56,15 @@ export interface CollectionContextType {
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   setParams: React.Dispatch<React.SetStateAction<KeyValueItem[]>>;
   setFormData: React.Dispatch<React.SetStateAction<FormDataItem[]>>;
-  setFormattedHeaders: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setFormattedHeaders: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   setHeaders: React.Dispatch<React.SetStateAction<KeyValueItem[]>>;
   setBody: React.Dispatch<React.SetStateAction<string>>;
   setShowResponse: React.Dispatch<React.SetStateAction<ApiResponse | null>>;
   setBodyMode: React.Dispatch<React.SetStateAction<"raw" | "formData">>;
-  setRequestArr:React.Dispatch<React.SetStateAction<Request[]>>
+  setRequestArr: React.Dispatch<React.SetStateAction<Request[]>>;
+  setCollection: React.Dispatch<React.SetStateAction<Collection[]>>;
 
   //api controller functions
   GetMethod: () => Promise<void>;
@@ -70,7 +74,9 @@ export interface CollectionContextType {
   DeleteMethod: () => Promise<void>;
 }
 
-export const CollectionContext = createContext<CollectionContextType | null>(null);
+export const CollectionContext = createContext<CollectionContextType | null>(
+  null
+);
 
 export const useCollection = () => {
   const context = useContext(CollectionContext);
@@ -83,6 +89,7 @@ export const useCollection = () => {
 export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [collection, setCollection] = useState<Collection[]>([]);
   const [method, setMethod] = useState("GET");
   const [baseUrl, setBaseUrl] = useState("https://dummyjson.com/products");
   const [finalUrl, setFinalUrl] = useState(baseUrl);
@@ -107,13 +114,11 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
   const [showResponse, setShowResponse] = useState<any>(null);
   const [bodyMode, setBodyMode] = useState<"raw" | "formData">("raw");
 
-  const [requestArr,setRequestArr] =useState<Request[]>([])
+  const [requestArr, setRequestArr] = useState<Request[]>([]);
 
+  //   api handler
 
-
-//   api handler 
-
-const createFormData = () => {
+  const createFormData = () => {
     const valid = formData.filter((f) => f.enabled && f.key.trim() !== "");
 
     if (valid.length === 0) return null;
@@ -148,8 +153,6 @@ const createFormData = () => {
       setShowResponse(error?.response?.data);
     }
   };
-
-  
 
   const PostMethod = async () => {
     try {
@@ -233,7 +236,8 @@ const createFormData = () => {
     body,
     showResponse,
     bodyMode,
-    requestArr
+    requestArr,
+    collection,
   };
   const all_states_update_func = {
     setMethod,
@@ -247,7 +251,8 @@ const createFormData = () => {
     setBody,
     setShowResponse,
     setBodyMode,
-    setRequestArr
+    setRequestArr,
+    setCollection,
   };
 
   const all_api_controllers = {
@@ -255,11 +260,15 @@ const createFormData = () => {
     PostMethod,
     PutMethod,
     PatchMethod,
-    DeleteMethod
+    DeleteMethod,
   };
   return (
     <CollectionContext.Provider
-      value={{ ...all_states, ...all_states_update_func, ...all_api_controllers }}
+      value={{
+        ...all_states,
+        ...all_states_update_func,
+        ...all_api_controllers,
+      }}
     >
       {children}
     </CollectionContext.Provider>

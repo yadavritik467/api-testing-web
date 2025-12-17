@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
-import { Send, Plus, X } from "lucide-react";
 import Editor from "@monaco-editor/react";
+import { Plus, Send, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Resizable } from "react-resizable";
-import { KeyValueItem, useCollection } from "../context/Collection";
-import { methodColors1, RequestMethod } from "../layouts/Sidebar";
 import { useSearchParams } from "react-router-dom";
+import { KeyValueItem, useCollection } from "../context/Collection";
+import {
+  Collection,
+  Folder,
+  methodColors1,
+  RequestMethod,
+} from "../layouts/Sidebar";
 
 const Home = () => {
   const {
@@ -33,6 +38,7 @@ const Home = () => {
     setBody,
     setBodyMode,
     setRequestArr,
+    setCollection,
 
     // apis handler
 
@@ -241,6 +247,48 @@ const Home = () => {
   const handleEditorChange = (value: string) => {
     setBody(value);
   };
+
+  // collection logic
+  const updateCollection = (
+    colId: number,
+    fn: (c: Collection) => Collection
+  ) => {
+    setCollection((cols) => cols?.map((c) => (c.id === colId ? fn(c) : c)));
+  };
+
+  // folders logic
+  const updateFolders = (
+    colId: number,
+    folderId: number,
+    fn: (f: Folder) => Folder
+  ) => {
+    updateCollection(colId, (c) => ({
+      ...c,
+      hasFolder: c?.hasFolder.map((f) =>
+        f?.folderId === folderId ? fn(f) : f
+      ),
+    }));
+  };
+
+  const updatingReqMethod = (e: any) => {
+    const value = e?.target?.value;
+    setMethod(value);
+    setRequestArr((prev) =>
+      prev.map((p) =>
+        p.colId === CollectionId &&
+        p.folderId === FolderID &&
+        p.reqId === RequestID
+          ? { ...p, method: value as RequestMethod }
+          : p
+      )
+    );
+    updateFolders(CollectionId, FolderID, (f) => ({
+      ...f,
+      hasRequests: f?.hasRequests.map((r) =>
+        r.reqId === RequestID ? { ...r, method: value } : r
+      ),
+    }));
+  };
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -299,20 +347,7 @@ const Home = () => {
             <div className="relative">
               <select
                 value={method}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  setMethod(value);
-                  setRequestArr((prev) =>
-                    prev.map((p) =>
-                      p.colId === CollectionId &&
-                      p.folderId === FolderID &&
-                      p.reqId === RequestID
-                        ? { ...p, method: value as RequestMethod }
-                        : p
-                    )
-                  );
-                }}
+                onChange={(e) => updatingReqMethod(e)}
                 className={`${methodColors[method]} text-white font-semibold px-4 py-3 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 appearance-none pr-10 w-full md:w-auto`}
               >
                 {methods.map((m) => (
