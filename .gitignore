@@ -1,5 +1,7 @@
 node_modules/
 public_html/
+dist
 
 front/node_modules/
 front/public_html/
+front/dist/
