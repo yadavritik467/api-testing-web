@@ -20,16 +20,10 @@ const Login = () => {
   const navigate = useNavigate()
 
   const handleLogin = async (e: any) => {
-
     e.preventDefault()
-
 
     setLoading(true)
 
-    
-
-
-    
     try {
       const { data } = await axios.post('/api/v1/srop-login', {
         email,
