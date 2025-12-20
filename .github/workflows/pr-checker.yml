@@ -38,7 +38,6 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      # यह स्टेप्स तभी चलेंगे जब बदलाव होंगे
       - name: Install and Build Frontend
         if: needs.filter-changes.outputs.frontend_changed == 'true'
         working-directory: ./frontend
@@ -55,12 +54,12 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(frontend): apply prettier"
+            git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # अगर कोई बदलाव नहीं है, तो यह स्टेप बस एक मैसेज प्रिंट करेगा और जॉब 'Success' हो जाएगी
       - name: Skip Message
         if: needs.filter-changes.outputs.frontend_changed != 'true'
         run: echo "No changes in frontend, skipping logic but marking job as success"
@@ -92,6 +91,7 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(backend): apply prettier"
+            git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
