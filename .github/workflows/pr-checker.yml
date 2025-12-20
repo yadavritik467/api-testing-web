@@ -28,98 +28,75 @@ jobs:
               - 'backend/**'  
 
   frontend-build:
-    if: ${{ needs.filter-changes.outputs.frontend_changed == 'true' }}
     needs: filter-changes
     name: Frontend Build Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        if: needs.filter-changes.outputs.frontend_changed == 'true'
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Cache node modules  
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      # npm ci is faster & deterministic
-      - name: Install dependencies
-        run: npm ci 
-
-      - name: Run Build
-        run: npm run build
-      
-      - name: Run prettier
-        run: npm run format
-
-      - name: Commit and push changes (Formatted Code)
+      # यह स्टेप्स तभी चलेंगे जब बदलाव होंगे
+      - name: Install and Build Frontend
+        if: needs.filter-changes.outputs.frontend_changed == 'true'
+        working-directory: ./frontend
         run: |
-          git config --global user.name ${{github.actor}}
-          git config --global user.email ${{github.event.pull_request.user.login}}
+          npm ci
+          npm run build
+          npm run format
+
+      - name: Commit changes
+        if: needs.filter-changes.outputs.frontend_changed == 'true'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git add .
-          git diff --cached
-          if git diff --cached --quiet; then
-             echo "No changes to commit"
-          else
-            git commit -m "chore(frontend): apply prettier formatting"
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(frontend): apply prettier"
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
+      # अगर कोई बदलाव नहीं है, तो यह स्टेप बस एक मैसेज प्रिंट करेगा और जॉब 'Success' हो जाएगी
+      - name: Skip Message
+        if: needs.filter-changes.outputs.frontend_changed != 'true'
+        run: echo "No changes in frontend, skipping logic but marking job as success"
 
   backend-build:
-    if: ${{ needs.filter-changes.outputs.backend_changed == 'true' }}
     needs: filter-changes
     name: Backend Build Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        if: needs.filter-changes.outputs.backend_changed == 'true'
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Cache node modules  
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
-
-      # npm ci is faster & deterministic
-      - name: Install dependencies
-        run: npm ci 
-
-      - name: Run Build
-        run: npm run build
-      
-      - name: Run prettier
-        run: npm run format
-
-      - name: Commit and push changes (Formatted Code)
+      - name: Install and Build Backend
+        if: needs.filter-changes.outputs.backend_changed == 'true'
+        working-directory: ./backend
         run: |
-          git config --global user.name ${{github.actor}}
-          git config --global user.email ${{github.event.pull_request.user.login}}
+          npm ci
+          npm run build
+          npm run format
+
+      - name: Commit changes
+        if: needs.filter-changes.outputs.backend_changed == 'true'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git add .
-          git diff --cached
-          if git diff --cached --quiet; then
-             echo "No changes to commit"
-          else
-            git commit -m "chore(backend): apply prettier formatting"
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(backend): apply prettier"
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip Message
+        if: needs.filter-changes.outputs.backend_changed != 'true'
+        run: echo "No changes in backend, skipping logic but marking job as success"
