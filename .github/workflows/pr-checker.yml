@@ -32,16 +32,15 @@ jobs:
               - 'backend/**'  
 
   frontend-build:
-    if: github.actor != 'github-actions[bot]'
     needs: filter-changes
     name: Frontend Build Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        if: needs.filter-changes.outputs.frontend_changed == 'true'
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
+        # if: needs.filter-changes.outputs.frontend_changed == 'true'
+        # with:
+        #   ref: ${{ github.head_ref }}
+        #   fetch-depth: 0
 
       - name: Install and Build Frontend
         if: needs.filter-changes.outputs.frontend_changed == 'true'
@@ -59,7 +58,7 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(frontend): apply prettier"
-            git pull --rebase origin ${{ github.head_ref }}
+            git pull pull origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
@@ -70,16 +69,15 @@ jobs:
         run: echo "No changes in frontend, skipping logic but marking job as success"
 
   backend-build:
-    if: github.actor != 'github-actions[bot]'
     needs: filter-changes
     name: Backend Build Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        if: needs.filter-changes.outputs.backend_changed == 'true'
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
+        # if: needs.filter-changes.outputs.backend_changed == 'true'
+        # with:
+        #   ref: ${{ github.head_ref }}
+        #   fetch-depth: 0
 
       - name: Install and Build Backend
         if: needs.filter-changes.outputs.backend_changed == 'true'
@@ -97,7 +95,7 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(backend): apply prettier"
-            git pull --rebase origin ${{ github.head_ref }}
+            git pull pull origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
