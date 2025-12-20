@@ -55,7 +55,7 @@ jobs:
 
       - name: Install and Build Frontend
         if: needs.filter-changes.outputs.frontend_changed == 'true'
-        working-directory: ./frontend
+        working-directory: frontend
         run: |
           npm ci
           npm run build
@@ -100,7 +100,7 @@ jobs:
 
       - name: Install and Build Backend
         if: needs.filter-changes.outputs.backend_changed == 'true'
-        working-directory: ./backend
+        working-directory: backend
         run: |
           npm ci
           npm run build
