@@ -54,7 +54,7 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(frontend): apply prettier"
-            git pull --rebase origin ${{ github.head_ref }}
+            # git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
@@ -91,7 +91,7 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(backend): apply prettier"
-            git pull --rebase origin ${{ github.head_ref }}
+            # git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
