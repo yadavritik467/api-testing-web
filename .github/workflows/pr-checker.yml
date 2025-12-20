@@ -38,6 +38,7 @@ jobs:
         if: needs.filter-changes.outputs.frontend_changed == 'true'
         with:
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
 
       - name: Install and Build Frontend
@@ -60,7 +61,7 @@ jobs:
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Skip Message
         if: needs.filter-changes.outputs.frontend_changed != 'true'
@@ -97,7 +98,7 @@ jobs:
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Skip Message
         if: needs.filter-changes.outputs.backend_changed != 'true'
