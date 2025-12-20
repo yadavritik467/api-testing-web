@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frontend_changed: ${{ steps.paths.outputs.frontend }}
+      backend_changed: ${{ steps.paths.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
       - name: Check for changes in paths
