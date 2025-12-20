@@ -1,5 +1,9 @@
 name: PR Checker
 
+concurrency:
+  group: pr-${{ github.head_ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
@@ -28,6 +32,7 @@ jobs:
               - 'backend/**'  
 
   frontend-build:
+    if: github.actor != 'github-actions[bot]'
     needs: filter-changes
     name: Frontend Build Test
     runs-on: ubuntu-latest
@@ -65,6 +70,7 @@ jobs:
         run: echo "No changes in frontend, skipping logic but marking job as success"
 
   backend-build:
+    if: github.actor != 'github-actions[bot]'
     needs: filter-changes
     name: Backend Build Test
     runs-on: ubuntu-latest
