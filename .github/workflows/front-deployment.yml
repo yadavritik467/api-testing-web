@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "front/**"
-      - ".github/workflows/front-deployment.yml"
+      - "frontend/**"
+      - ".github/workflows/frontend-deployment.yml"
   workflow_dispatch:
 
 permissions:
@@ -29,21 +29,21 @@ jobs:
         with:
           node-version: 18
           cache: "npm"
-          cache-dependency-path: front/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
         
       # npm ci is faster & deterministic
       - name: Install dependencies
-        working-directory: front
+        working-directory: frontend
         run: npm ci 
 
       - name: Build frontend
-        working-directory: front
+        working-directory: frontend
         run: npm run build
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: front/dist
+          path: frontend/dist
 
   deploy:
     needs: build
