@@ -6,7 +6,9 @@ permissions:
   statuses: write 
   
 on:
+  workflow_dispatch:
   pull_request:
+    types: [opened, synchronize]
     branches: [main]
 
 jobs:
@@ -36,6 +38,7 @@ jobs:
         if: needs.filter-changes.outputs.frontend_changed == 'true'
         with:
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
 
       - name: Install and Build Frontend
@@ -49,8 +52,8 @@ jobs:
       - name: Commit changes
         if: needs.filter-changes.outputs.frontend_changed == 'true'
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name ${{ github.actor }}
+          git config --global user.email ${{ github.event.pull_request.user.login }}
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(frontend): apply prettier"
@@ -58,7 +61,7 @@ jobs:
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Skip Message
         if: needs.filter-changes.outputs.frontend_changed != 'true'
@@ -86,8 +89,8 @@ jobs:
       - name: Commit changes
         if: needs.filter-changes.outputs.backend_changed == 'true'
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name ${{ github.actor }}
+          git config --global user.email ${{ github.event.pull_request.user.login }}
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "chore(backend): apply prettier"
@@ -95,7 +98,7 @@ jobs:
             git push origin HEAD:${{ github.head_ref }}
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Skip Message
         if: needs.filter-changes.outputs.backend_changed != 'true'
