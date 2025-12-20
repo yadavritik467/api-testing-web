@@ -20,7 +20,6 @@ const Login = () => {
   const navigate = useNavigate()
 
   const handleLogin = async (e: any) => {
-
     e.preventDefault()
 
     setLoading(true)
