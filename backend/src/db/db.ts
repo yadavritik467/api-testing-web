@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 export const dbConnection = async () => {
   let isConnected = false
+
   try {
     console.log('please wait db is tring to connecting ..')
 
