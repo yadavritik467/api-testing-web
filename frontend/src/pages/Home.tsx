@@ -297,12 +297,7 @@ const Home = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-
-
-          
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-
-
             API Testing
           </h1>
           <p className="text-gray-600 mt-1">Test your API endpoints</p>
