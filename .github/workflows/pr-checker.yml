@@ -37,10 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        # if: needs.filter-changes.outputs.frontend_changed == 'true'
-        # with:
-        #   ref: ${{ github.head_ref }}
-        #   fetch-depth: 0
+        if: needs.filter-changes.outputs.frontend_changed == 'true'
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       - name: Install and Build Frontend
         if: needs.filter-changes.outputs.frontend_changed == 'true'
@@ -74,10 +74,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        # if: needs.filter-changes.outputs.backend_changed == 'true'
-        # with:
-        #   ref: ${{ github.head_ref }}
-        #   fetch-depth: 0
+        if: needs.filter-changes.outputs.backend_changed == 'true'
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       - name: Install and Build Backend
         if: needs.filter-changes.outputs.backend_changed == 'true'
