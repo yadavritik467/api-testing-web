@@ -2,7 +2,7 @@ import cors from 'cors'
 import express, { type Request, type Response } from 'express'
 import { dbConnection } from './db/db.js'
 
-const app = express()
+// const app = express()
 
 const port = 4500
 app.use(
