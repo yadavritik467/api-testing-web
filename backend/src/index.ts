@@ -4,7 +4,19 @@ import { dbConnection } from "./db/db.js";
 
 const app = express();
 
+
+
+
+
+
+
+
 const port = 4500;
+
+
+
+
+
 app.use(
   cors({
     origin: "http://localhost:5174",
@@ -12,6 +24,11 @@ app.use(
 );
 
 dbConnection()
+
+
+
+
+
 
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
