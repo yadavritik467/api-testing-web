@@ -25,6 +25,9 @@ const Login = () => {
     setLoading(true)
 
     try {
+
+
+
       const { data } = await axios.post('/api/v1/srop-login', {
         email,
         password,
@@ -46,13 +49,22 @@ const Login = () => {
       {/* Header */}
       <header className="flex justify-between items-center w-[80%] max-sm:w-[90%] mx-auto">
         <div className="flex items-center gap-3">
+
+
+
           <img
+
+
+
             src="/images/logo.png"
             className="w-[200px] h-[100px] object-contain"
             alt=""
           />
         </div>
         <button
+
+
+
           onClick={() => navigate('/signup')}
           className="bg-[#3167F2] text-white px-6 py-2.5 rounded-[5px] font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
         >
@@ -60,11 +72,20 @@ const Login = () => {
         </button>
       </header>
 
+
+
+
+
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 w-[80%] max-sm:w-[90%] mx-auto">
         {/* Login Form */}
         <div className="w-full lg:w-1/2 max-w-md">
           <div className="">
+
+
+
+
+            
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3">
               Login now
             </h1>
