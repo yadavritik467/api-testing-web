@@ -100,6 +100,7 @@ const Login = () => {
                 >
                   Password
                 </label>
+
                 <div className="relative">
                   <input
                     id="password"
