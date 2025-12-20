@@ -72,10 +72,21 @@ const Login = () => {
               Hi, Welcome back <span className="inline-block">👋</span>
             </p>
 
+
+
+
+
+
             {/* Email Input */}
             <form onSubmit={handleLogin}>
               <div className="mb-5">
+
+
+
                 <label
+
+
+
                   className="block text-gray-900 font-semibold mb-2"
                   htmlFor="email"
                 >
