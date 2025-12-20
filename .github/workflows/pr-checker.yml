@@ -6,7 +6,9 @@ permissions:
   statuses: write 
   
 on:
+  workflow_dispatch:
   pull_request:
+    types: [opened, synchronize]
     branches: [main]
 
 jobs:
