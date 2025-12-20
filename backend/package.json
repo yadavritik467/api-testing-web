@@ -5,8 +5,13 @@
   "type": "module",
   "scripts": {
     "start": "node dist/index.js",
+
+
     "dev": "tsx watch src/index.ts",
+    
     "format": "prettier --write .",
+"format:check": "prettier . --check",
+    
     "build": "npx tsc"
   },
   "keywords": [],

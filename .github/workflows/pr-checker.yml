@@ -60,24 +60,25 @@ jobs:
           npm ci
           npm run build
           npm run format
+          npm run format:check
 
-      - name: Commit changes
-        if: needs.filter-changes.outputs.frontend_changed == 'true'
-        run: |
-          git config --global user.name ${{ github.actor }}
-          git config --global user.email ${{ github.event.pull_request.user.login }}
-          git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(frontend): apply prettier"
-            git pull --rebase origin ${{ github.head_ref }}
-            git push origin HEAD:${{ github.head_ref }}
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+      # - name: Commit changes
+      #   if: needs.filter-changes.outputs.frontend_changed == 'true'
+      #   run: |
+      #     git config --global user.name ${{ github.actor }}
+      #     git config --global user.email ${{ github.event.pull_request.user.login }}
+      #     git add .
+      #     if ! git diff --cached --quiet; then
+      #       git commit -m "chore(frontend): apply prettier"
+      #       git pull --rebase origin ${{ github.head_ref }}
+      #       git push origin HEAD:${{ github.head_ref }}
+      #     fi
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MY_PAT }}
 
-      - name: Skip Message
-        if: needs.filter-changes.outputs.frontend_changed != 'true'
-        run: echo "No changes in frontend, skipping logic but marking job as success"
+      # - name: Skip Message
+      #   if: needs.filter-changes.outputs.frontend_changed != 'true'
+      #   run: echo "No changes in frontend, skipping logic but marking job as success"
 
   backend-build:
     needs: filter-changes
@@ -105,21 +106,22 @@ jobs:
           npm ci
           npm run build
           npm run format
+          npm run format:check
 
-      - name: Commit changes
-        if: needs.filter-changes.outputs.backend_changed == 'true'
-        run: |
-          git config --global user.name ${{ github.actor }}
-          git config --global user.email ${{ github.event.pull_request.user.login }}
-          git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(backend): apply prettier"
-            git pull --rebase origin ${{ github.head_ref }}
-            git push origin HEAD:${{ github.head_ref }}
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+      # - name: Commit changes
+      #   if: needs.filter-changes.outputs.backend_changed == 'true'
+      #   run: |
+      #     git config --global user.name ${{ github.actor }}
+      #     git config --global user.email ${{ github.event.pull_request.user.login }}
+      #     git add .
+      #     if ! git diff --cached --quiet; then
+      #       git commit -m "chore(backend): apply prettier"
+      #       git pull --rebase origin ${{ github.head_ref }}
+      #       git push origin HEAD:${{ github.head_ref }}
+      #     fi
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MY_PAT }}
 
-      - name: Skip Message
-        if: needs.filter-changes.outputs.backend_changed != 'true'
-        run: echo "No changes in backend, skipping logic but marking job as success"
+      # - name: Skip Message
+      #   if: needs.filter-changes.outputs.backend_changed != 'true'
+      #   run: echo "No changes in backend, skipping logic but marking job as success"
