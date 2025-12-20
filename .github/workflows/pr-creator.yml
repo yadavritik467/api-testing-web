@@ -1,0 +1,18 @@
+name: Pull Request First Job Creator
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: write 
+  
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  name: PR Checker
+  build:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v4
+       - echo : "Status Reported"
