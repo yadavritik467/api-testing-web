@@ -58,9 +58,8 @@ jobs:
         working-directory: frontend
         run: |
           npm ci
-          npm run build
-          npm run format
           npm run format:check
+          npm run build
 
       # - name: Commit changes
       #   if: needs.filter-changes.outputs.frontend_changed == 'true'
@@ -104,9 +103,8 @@ jobs:
         working-directory: backend
         run: |
           npm ci
-          npm run build
-          npm run format
           npm run format:check
+          npm run build
 
       # - name: Commit changes
       #   if: needs.filter-changes.outputs.backend_changed == 'true'
