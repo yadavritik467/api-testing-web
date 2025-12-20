@@ -11,12 +11,16 @@ app.use(
   })
 );
 
+
+
 dbConnection()
 
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("hii from server and its working good !!");
+
+
+  res.send("hii from server and its working  !!");
 });
  
 app.listen(port, () => {
