@@ -1,11 +1,11 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/api-testing-web/",
+  base: '/api-testing-web/',
   build: {
-    outDir: "dist",
+    outDir: 'dist',
   },
   plugins: [react()],
   server: {
@@ -13,4 +13,4 @@ export default defineConfig({
     port: 5174, // Default port
     open: false,
   },
-});
+})

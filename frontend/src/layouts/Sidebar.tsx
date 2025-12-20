@@ -1,89 +1,89 @@
-import { ChevronDown, ChevronRight, Folder, Plus, Trash } from "lucide-react";
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useCollection } from "../context/Collection";
+import { ChevronDown, ChevronRight, Folder, Plus, Trash } from 'lucide-react'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useCollection } from '../context/Collection'
 
-export type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 export interface Request {
-  colId?: number;
-  folderId?: number;
-  reqId: number;
-  reqName: string;
-  isEditing: boolean;
-  method: RequestMethod;
-  url: string;
+  colId?: number
+  folderId?: number
+  reqId: number
+  reqName: string
+  isEditing: boolean
+  method: RequestMethod
+  url: string
 }
 export interface Folder {
-  folderId: number;
-  folderName: string;
-  isFolderOpen: boolean;
-  isEditing: boolean;
-  hasRequests: Request[];
+  folderId: number
+  folderName: string
+  isFolderOpen: boolean
+  isEditing: boolean
+  hasRequests: Request[]
 }
 export interface Collection {
-  id: number;
-  isCollectionOpen: boolean;
-  isEditing: boolean;
-  collectionName: string;
-  hasFolder: Folder[];
+  id: number
+  isCollectionOpen: boolean
+  isEditing: boolean
+  collectionName: string
+  hasFolder: Folder[]
 }
 
 export const methodColors1: { [key: string]: any } = {
-  GET: "text-green-500",
-  POST: "text-yellow-500",
-  PUT: "text-blue-500",
-  PATCH: "text-purple-500",
-  DELETE: "text-red-500",
-};
+  GET: 'text-green-500',
+  POST: 'text-yellow-500',
+  PUT: 'text-blue-500',
+  PATCH: 'text-purple-500',
+  DELETE: 'text-red-500',
+}
 
 const Sidebar = () => {
-  const { collection, setCollection, setRequestArr } = useCollection();
-  const [_, setSearchParams] = useSearchParams();
+  const { collection, setCollection, setRequestArr } = useCollection()
+  const [_, setSearchParams] = useSearchParams()
 
   useEffect(() => {
     const stored: Collection[] = JSON.parse(
-      localStorage.getItem("collection") as string
-    );
+      localStorage.getItem('collection') as string
+    )
     if (stored?.length) {
-      const parsed = stored;
-      setCollection(parsed);
-      return;
+      const parsed = stored
+      setCollection(parsed)
+      return
     } else {
       const collecArr = [
         {
           id: 0,
           isCollectionOpen: true,
           isEditing: false,
-          collectionName: "New Collection",
+          collectionName: 'New Collection',
           hasFolder: [
             {
               folderId: 0,
-              folderName: "New Folder",
+              folderName: 'New Folder',
               isFolderOpen: true,
               isEditing: false,
               hasRequests: [
                 {
                   reqId: 0,
                   isEditing: false,
-                  reqName: "New Request",
-                  method: "GET",
-                  url: "",
+                  reqName: 'New Request',
+                  method: 'GET',
+                  url: '',
                 },
               ],
             },
           ],
         },
-      ];
-      setCollection(collecArr as Collection[]);
-      return;
+      ]
+      setCollection(collecArr as Collection[])
+      return
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (collection?.length) {
-      localStorage.setItem("collection", JSON.stringify(collection));
+      localStorage.setItem('collection', JSON.stringify(collection))
     }
-  }, [collection]);
+  }, [collection])
 
   const createCollection = () => {
     setCollection((p) => [
@@ -92,61 +92,61 @@ const Sidebar = () => {
         id: p?.length + 1,
         isCollectionOpen: true,
         isEditing: false,
-        collectionName: "New Collection",
+        collectionName: 'New Collection',
         hasFolder: [
           {
             folderId: 0,
-            folderName: "New Folder",
+            folderName: 'New Folder',
             isEditing: false,
             isFolderOpen: true,
             hasRequests: [
               {
                 reqId: 0,
                 isEditing: false,
-                reqName: "New Request",
-                method: "GET",
-                url: "",
+                reqName: 'New Request',
+                method: 'GET',
+                url: '',
               },
             ],
           },
         ],
       },
-    ]);
-  };
+    ])
+  }
 
   // collection logic
   const updateCollection = (
     colId: number,
     fn: (c: Collection) => Collection
   ) => {
-    setCollection((cols) => cols?.map((c) => (c.id === colId ? fn(c) : c)));
-  };
+    setCollection((cols) => cols?.map((c) => (c.id === colId ? fn(c) : c)))
+  }
 
   const deleteCollecion = (colId: number) => {
-    setCollection((cols) => cols?.filter((c) => c.id !== colId));
-  };
+    setCollection((cols) => cols?.filter((c) => c.id !== colId))
+  }
 
   const changeCollectionName = (colId: number) => {
     updateCollection(colId, (c) => ({
       ...c,
       isEditing: c?.isEditing === true ? false : true,
-    }));
-  };
+    }))
+  }
 
   const saveCollectionName = (colId: number, val: string) => {
     updateCollection(colId, (c) => ({
       ...c,
       collectionName: val,
       isEditing: false,
-    }));
-  };
+    }))
+  }
 
   const toggleCollection = (colId: number) => {
     updateCollection(colId, (c) => ({
       ...c,
       isCollectionOpen: !c?.isCollectionOpen,
-    }));
-  };
+    }))
+  }
 
   // folder logic
   const updateFolders = (
@@ -159,15 +159,15 @@ const Sidebar = () => {
       hasFolder: c?.hasFolder.map((f) =>
         f?.folderId === folderId ? fn(f) : f
       ),
-    }));
-  };
+    }))
+  }
 
   const deleteFolder = (colId: number, folderId: number) => {
     updateCollection(colId, (c) => ({
       ...c,
       hasFolder: c?.hasFolder.filter((f) => f?.folderId !== folderId),
-    }));
-  };
+    }))
+  }
 
   const addFolder = (colId: number) => {
     updateCollection(colId, (c) => ({
@@ -177,42 +177,42 @@ const Sidebar = () => {
         {
           isEditing: false,
           folderId: c?.hasFolder?.length + 1,
-          folderName: "New Folder",
+          folderName: 'New Folder',
           isFolderOpen: false,
           hasRequests: [
             {
               reqId: 0,
               isEditing: false,
-              reqName: "New Request",
-              method: "GET",
-              url: "",
+              reqName: 'New Request',
+              method: 'GET',
+              url: '',
             },
           ],
         },
       ],
-    }));
-  };
+    }))
+  }
   const changeFolderName = (colId: number, folderId: number) => {
     updateFolders(colId, folderId, (f) => ({
       ...f,
       isEditing: f?.isEditing === true ? false : true,
-    }));
-  };
+    }))
+  }
 
   const saveFolderName = (colId: number, folderId: number, val: string) => {
     updateFolders(colId, folderId, (f) => ({
       ...f,
       folderName: val,
       isEditing: false,
-    }));
-  };
+    }))
+  }
 
   const toggleFolder = (colId: number, folderId: number) => {
     updateFolders(colId, folderId, (f) => ({
       ...f,
       isFolderOpen: !f?.isFolderOpen,
-    }));
-  };
+    }))
+  }
 
   // request logic
   const updateRequest = (
@@ -226,8 +226,8 @@ const Sidebar = () => {
       hasRequests: f.hasRequests?.map((r) =>
         r?.reqId === requestId ? fn(r) : r
       ),
-    }));
-  };
+    }))
+  }
 
   const addRequest = (colId: number, folderId: number) => {
     updateFolders(colId, folderId, (f) => ({
@@ -236,14 +236,14 @@ const Sidebar = () => {
         ...f?.hasRequests,
         {
           isEditing: false,
-          method: "GET",
+          method: 'GET',
           reqId: f?.hasRequests?.length + 1,
-          reqName: "New Request",
-          url: "",
+          reqName: 'New Request',
+          url: '',
         },
       ],
-    }));
-  };
+    }))
+  }
 
   const deleteRequest = (
     colId: number,
@@ -253,8 +253,8 @@ const Sidebar = () => {
     updateFolders(colId, folderId, (f) => ({
       ...f,
       hasRequests: f?.hasRequests?.filter((r) => r?.reqId !== requestId),
-    }));
-  };
+    }))
+  }
 
   const changeRequestName = (
     colId: number,
@@ -264,8 +264,8 @@ const Sidebar = () => {
     updateRequest(colId, folderId, requestId, (r) => ({
       ...r,
       isEditing: r?.isEditing === true ? false : true,
-    }));
-  };
+    }))
+  }
 
   const saveRequestName = (
     colId: number,
@@ -277,15 +277,15 @@ const Sidebar = () => {
       ...r,
       reqName: val,
       isEditing: false,
-    }));
+    }))
     setRequestArr((prev) =>
       prev.map((p) =>
         p?.colId === colId && p?.folderId === folderId && p?.reqId === requestId
           ? { ...p, reqName: val }
           : p
       )
-    );
-  };
+    )
+  }
 
   const createReqTabArr = (
     colId: number,
@@ -296,18 +296,18 @@ const Sidebar = () => {
       colId: String(colId),
       folderId: String(folderId),
       reqId: String(request.reqId),
-    });
+    })
     setRequestArr((prev) => {
       const isExist = prev?.some(
         (f) =>
           f?.colId === colId &&
           f?.folderId === folderId &&
           f?.reqId === request?.reqId
-      );
+      )
 
-      return isExist ? prev : [...prev, { colId, folderId, ...request }];
-    });
-  };
+      return isExist ? prev : [...prev, { colId, folderId, ...request }]
+    })
+  }
   return (
     <div className="w-full bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col h-[100vh] overflow-hidden">
       {/* Header Section */}
@@ -349,8 +349,8 @@ const Sidebar = () => {
                   defaultValue={c.collectionName}
                   onBlur={(e) => saveCollectionName(c?.id, e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      saveCollectionName(c?.id, e.currentTarget.value);
+                    if (e.key === 'Enter') {
+                      saveCollectionName(c?.id, e.currentTarget.value)
                     }
                   }}
                 />
@@ -364,8 +364,8 @@ const Sidebar = () => {
                   </p>
                   <button
                     onClick={(e) => {
-                      e.stopPropagation();
-                      deleteCollecion(c?.id);
+                      e.stopPropagation()
+                      deleteCollecion(c?.id)
                     }}
                     title="Delete Colection"
                     className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
@@ -374,8 +374,8 @@ const Sidebar = () => {
                   </button>
                   <button
                     onClick={(e) => {
-                      e.stopPropagation();
-                      addFolder(c?.id);
+                      e.stopPropagation()
+                      addFolder(c?.id)
                     }}
                     title="Add folder"
                     className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
@@ -418,12 +418,12 @@ const Sidebar = () => {
                             saveFolderName(c?.id, fol?.folderId, e.target.value)
                           }
                           onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                            if (e.key === 'Enter') {
                               saveFolderName(
                                 c?.id,
                                 fol?.folderId,
                                 e.currentTarget.value
-                              );
+                              )
                             }
                           }}
                         />
@@ -439,8 +439,8 @@ const Sidebar = () => {
                           </p>
                           <button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              deleteFolder(c?.id, fol?.folderId);
+                              e.stopPropagation()
+                              deleteFolder(c?.id, fol?.folderId)
                             }}
                             title="Delete folder"
                             className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
@@ -449,8 +449,8 @@ const Sidebar = () => {
                           </button>
                           <button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              addRequest(c?.id, fol?.folderId);
+                              e.stopPropagation()
+                              addRequest(c?.id, fol?.folderId)
                             }}
                             title="Add Request"
                             className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
@@ -491,13 +491,13 @@ const Sidebar = () => {
                                   )
                                 }
                                 onKeyDown={(e) => {
-                                  if (e.key === "Enter") {
+                                  if (e.key === 'Enter') {
                                     saveRequestName(
                                       c?.id,
                                       fol?.folderId,
                                       req?.reqId,
                                       e.currentTarget.value
-                                    );
+                                    )
                                   }
                                 }}
                               />
@@ -520,8 +520,8 @@ const Sidebar = () => {
                             )}
                             <button
                               onClick={(e) => {
-                                e.stopPropagation();
-                                deleteRequest(c?.id, fol?.folderId, req?.reqId);
+                                e.stopPropagation()
+                                deleteRequest(c?.id, fol?.folderId, req?.reqId)
                               }}
                               title="Delete folder"
                               className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-blue-100 rounded-lg transition-all duration-150"
@@ -540,7 +540,7 @@ const Sidebar = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

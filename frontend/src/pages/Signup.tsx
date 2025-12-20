@@ -1,40 +1,40 @@
-import { useState } from "react";
-import { AiFillEye } from "react-icons/ai";
-import { IoIosEyeOff } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from 'react'
+import { AiFillEye } from 'react-icons/ai'
+import { IoIosEyeOff } from 'react-icons/io'
+import { Link, useNavigate } from 'react-router-dom'
 // import axiosInstance from "../interceptor/interceptor";
-import Loader from "../ui/Loader";
-import axios from "axios";
+import Loader from '../ui/Loader'
+import axios from 'axios'
 
 const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [number, setNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [number, setNumber] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleSignup = async (e: any) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     try {
-      const { data } = await axios.post("/api/v1/srop-signup", {
+      const { data } = await axios.post('/api/v1/srop-signup', {
         name,
         email,
         password,
         number,
-      });
+      })
       if (data) {
-        navigate("/");
-        setLoading(false);
+        navigate('/')
+        setLoading(false)
       }
     } catch (error) {
-      console.log("err in login", error);
-      setLoading(false);
+      console.log('err in login', error)
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="h-screen overflow-y-scroll">
@@ -48,7 +48,7 @@ const Signup = () => {
           />
         </div>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           className="bg-[#3167F2] text-white px-6 py-2.5 rounded-[5px] font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
         >
           Login
@@ -68,7 +68,7 @@ const Signup = () => {
             </p>
 
             {/* Email Input */}
-            <form onSubmit={handleSignup} >
+            <form onSubmit={handleSignup}>
               <div className="mb-5">
                 <label
                   className="block text-gray-900 font-semibold mb-2"
@@ -100,11 +100,11 @@ const Signup = () => {
                   value={number}
                   maxLength={10}
                   onChange={(e) => {
-                    const value = e.target.value;
+                    const value = e.target.value
 
                     // Allow only numbers (0-9)
                     if (/^[0-9]*$/.test(value)) {
-                      setNumber(value);
+                      setNumber(value)
                     }
                   }}
                   className="w-full bg-[#BCCEFF] border-0 rounded-[5px] px-4 py-3.5 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
@@ -140,7 +140,7 @@ const Signup = () => {
                 <div className="relative">
                   <input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -166,15 +166,15 @@ const Signup = () => {
                 type="submit"
                 className="w-full bg-[#3167F2] text-white font-semibold py-3.5 px-4 rounded-[5px] transition-all duration-300 hover:-translate-y-1 flex justify-center items-center"
               >
-                {loading ? <Loader /> : "Signup"}
+                {loading ? <Loader /> : 'Signup'}
               </button>
             </form>
 
             {/* Sign Up Link */}
             <p className="text-center text-sm text-gray-600 my-6">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link
-                to={"/"}
+                to={'/'}
                 className="font-semibold text-blue-600 hover:text-blue-700"
               >
                 Login
@@ -192,7 +192,7 @@ const Signup = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Signup

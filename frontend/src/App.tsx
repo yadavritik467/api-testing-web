@@ -1,12 +1,12 @@
-import { lazy } from "react";
-import { Route, Routes } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "./index.css";
-import Sidebar from "./layouts/Sidebar";
+import { lazy } from 'react'
+import { Route, Routes } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import './index.css'
+import Sidebar from './layouts/Sidebar'
 
-const Home = lazy(() => import("./pages/Home"));
-const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
+const Home = lazy(() => import('./pages/Home'))
+const Login = lazy(() => import('./pages/Login'))
+const Signup = lazy(() => import('./pages/Signup'))
 
 const App = () => {
   return (
@@ -25,7 +25,7 @@ const App = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

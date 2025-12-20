@@ -1,40 +1,40 @@
-import { useState } from "react";
-import { AiFillEye } from "react-icons/ai";
-import { IoIosEyeOff } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from 'react'
+import { AiFillEye } from 'react-icons/ai'
+import { IoIosEyeOff } from 'react-icons/io'
+import { Link, useNavigate } from 'react-router-dom'
 // import { chatbot_front_url } from "../AppUrl";
 // import axiosInstance from "../interceptor/interceptor";
-import Loader from "../ui/Loader";
-import axios from "axios";
+import Loader from '../ui/Loader'
+import axios from 'axios'
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleLogin = async (e: any) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     try {
-      const { data } = await axios.post("/api/v1/srop-login", {
+      const { data } = await axios.post('/api/v1/srop-login', {
         email,
         password,
-      });
+      })
       if (data?.token) {
         // window.location.href = `${chatbot_front_url}/?page=dashboard&token=${encodeURIComponent(
         //   data?.token
         // )}`;
-        setLoading(false);
+        setLoading(false)
       }
     } catch (error) {
-      console.log("err in login", error);
-      setLoading(false);
+      console.log('err in login', error)
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="h-screen overflow-y-scroll">
@@ -48,7 +48,7 @@ const Login = () => {
           />
         </div>
         <button
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate('/signup')}
           className="bg-[#3167F2] text-white px-6 py-2.5 rounded-[5px] font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
         >
           Sign Up
@@ -98,7 +98,7 @@ const Login = () => {
                 <div className="relative">
                   <input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -145,15 +145,15 @@ const Login = () => {
                 type="submit"
                 className="w-full bg-[#3167F2] text-white font-semibold py-3.5 px-4 rounded-[5px] transition-all duration-300 hover:-translate-y-1 flex justify-center items-center"
               >
-                {loading ? <Loader /> : "Login"}
+                {loading ? <Loader /> : 'Login'}
               </button>
             </form>
 
             {/* Sign Up Link */}
             <p className="text-center text-sm text-gray-600 mt-6">
-              Not registered yet?{" "}
+              Not registered yet?{' '}
               <Link
-                to={"/signup"}
+                to={'/signup'}
                 className="font-semibold text-blue-600 hover:text-blue-700"
               >
                 Create an account
@@ -171,7 +171,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

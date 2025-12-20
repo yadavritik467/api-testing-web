@@ -1,15 +1,15 @@
-import Editor from "@monaco-editor/react";
-import { Plus, Send, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Resizable } from "react-resizable";
-import { useSearchParams } from "react-router-dom";
-import { KeyValueItem, useCollection } from "../context/Collection";
+import Editor from '@monaco-editor/react'
+import { Plus, Send, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Resizable } from 'react-resizable'
+import { useSearchParams } from 'react-router-dom'
+import { KeyValueItem, useCollection } from '../context/Collection'
 import {
   Collection,
   Folder,
   methodColors1,
   RequestMethod,
-} from "../layouts/Sidebar";
+} from '../layouts/Sidebar'
 
 const Home = () => {
   const {
@@ -47,32 +47,32 @@ const Home = () => {
     PutMethod,
     PatchMethod,
     DeleteMethod,
-  } = useCollection();
-  const [editorHeight, setEditorHeight] = useState(300); // px
+  } = useCollection()
+  const [editorHeight, setEditorHeight] = useState(300) // px
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const CollectionId = Number(searchParams?.get("colId"));
-  const FolderID = Number(searchParams?.get("folderId"));
-  const RequestID = Number(searchParams?.get("reqId"));
+  const [searchParams, setSearchParams] = useSearchParams()
+  const CollectionId = Number(searchParams?.get('colId'))
+  const FolderID = Number(searchParams?.get('folderId'))
+  const RequestID = Number(searchParams?.get('reqId'))
 
-  const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+  const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
   const methodColors: { [key: string]: any } = {
-    GET: "bg-green-500 hover:bg-green-600",
-    POST: "bg-yellow-500 hover:bg-yellow-600",
-    PUT: "bg-blue-500 hover:bg-blue-600",
-    PATCH: "bg-purple-500 hover:bg-purple-600",
-    DELETE: "bg-red-500 hover:bg-red-600",
-  };
+    GET: 'bg-green-500 hover:bg-green-600',
+    POST: 'bg-yellow-500 hover:bg-yellow-600',
+    PUT: 'bg-blue-500 hover:bg-blue-600',
+    PATCH: 'bg-purple-500 hover:bg-purple-600',
+    DELETE: 'bg-red-500 hover:bg-red-600',
+  }
 
   // parmas logic
   const addParam = () => {
-    setParams([...params, { key: "", value: "", enabled: false }]);
-  };
+    setParams([...params, { key: '', value: '', enabled: false }])
+  }
 
   const removeParam = (index: number) => {
-    setParams(params.filter((_: any, i: number) => i !== index));
-  };
+    setParams(params.filter((_: any, i: number) => i !== index))
+  }
 
   const updateParam = (
     index: number,
@@ -80,20 +80,20 @@ const Home = () => {
     value: string | boolean
   ) => {
     setParams((prev: typeof params) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
-  };
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
 
   // header logic
   const addHeader = () => {
-    setHeaders([...headers, { key: "", value: "", enabled: false }]);
-  };
+    setHeaders([...headers, { key: '', value: '', enabled: false }])
+  }
 
   const removeHeader = (index: number) => {
-    setHeaders(headers.filter((_: any, i: number) => i !== index));
-  };
+    setHeaders(headers.filter((_: any, i: number) => i !== index))
+  }
 
   const updateHeader = (
     index: number,
@@ -101,160 +101,163 @@ const Home = () => {
     value: string | boolean
   ) => {
     setHeaders((prev: KeyValueItem[]) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
-  };
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
 
   // form data logic
   const addFormData = () => {
     setFormData([
       ...formData,
-      { type: "text", key: "", value: "", enabled: false },
-    ]);
-  };
+      { type: 'text', key: '', value: '', enabled: false },
+    ])
+  }
 
   const removeFormData = (index: number) => {
-    setFormData(formData.filter((_: any, i: number) => i !== index));
-  };
+    setFormData(formData.filter((_: any, i: number) => i !== index))
+  }
 
   const updateFormData = (index: number, field: string, value: any) => {
     setFormData((prev: KeyValueItem[]) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
-  };
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
 
   // generate and upate url in live thorough params
 
   const generateParamsUrl = () => {
     const activeParams = params
-      .filter((p) => p?.enabled && p.key.trim() !== "")
+      .filter((p) => p?.enabled && p.key.trim() !== '')
       .map(
         (p) =>
           `${encodeURIComponent(p?.key)}=${encodeURIComponent(
             p?.value as string
           )}`
       )
-      .join("&");
+      .join('&')
 
-    return activeParams ? `${baseUrl}?${activeParams}` : baseUrl;
-  };
+    return activeParams ? `${baseUrl}?${activeParams}` : baseUrl
+  }
 
   useEffect(() => {
     if (headers) {
-      const formatHeaders = headers.reduce((acc, item) => {
-        if (item?.enabled) acc[item.key] = String(item.value);
-        return acc;
-      }, {} as Record<string, string>);
-      setFormattedHeaders(formatHeaders);
+      const formatHeaders = headers.reduce(
+        (acc, item) => {
+          if (item?.enabled) acc[item.key] = String(item.value)
+          return acc
+        },
+        {} as Record<string, string>
+      )
+      setFormattedHeaders(formatHeaders)
     }
-  }, [headers]);
+  }, [headers])
 
   useEffect(() => {
-    const updated = generateParamsUrl();
-    setFinalUrl(updated);
-  }, [params, baseUrl]);
+    const updated = generateParamsUrl()
+    setFinalUrl(updated)
+  }, [params, baseUrl])
 
   const sendRequest = () => {
-    if (method === "GET") {
-      GetMethod();
-      return;
-    } else if (method === "POST") {
-      PostMethod();
-      return;
-    } else if (method === "PUT") {
-      PutMethod();
-      return;
-    } else if (method === "PATCH") {
-      PatchMethod();
-      return;
-    } else if (method === "DELETE") {
-      DeleteMethod();
-      return;
+    if (method === 'GET') {
+      GetMethod()
+      return
+    } else if (method === 'POST') {
+      PostMethod()
+      return
+    } else if (method === 'PUT') {
+      PutMethod()
+      return
+    } else if (method === 'PATCH') {
+      PatchMethod()
+      return
+    } else if (method === 'DELETE') {
+      DeleteMethod()
+      return
     }
-  };
+  }
 
   const formatTime = (ms: number) => {
-    if (!ms) return "";
+    if (!ms) return ''
 
-    if (ms < 1000) return `${Math.round(ms)} ms`;
-    return `${(ms / 1000).toFixed(2)} s`;
-  };
+    if (ms < 1000) return `${Math.round(ms)} ms`
+    return `${(ms / 1000).toFixed(2)} s`
+  }
 
   const getStatusInfo = (status: number) => {
     switch (status) {
       case 200:
         return {
-          label: "Success",
-          bg: "bg-green-100",
-          text: "text-green-700",
-        };
+          label: 'Success',
+          bg: 'bg-green-100',
+          text: 'text-green-700',
+        }
 
       case 201:
         return {
-          label: "Created",
-          bg: "bg-green-100",
-          text: "text-green-700",
-        };
+          label: 'Created',
+          bg: 'bg-green-100',
+          text: 'text-green-700',
+        }
 
       case 301:
         return {
-          label: "Redirect",
-          bg: "bg-yellow-100",
-          text: "text-yellow-700",
-        };
+          label: 'Redirect',
+          bg: 'bg-yellow-100',
+          text: 'text-yellow-700',
+        }
 
       case 400:
         return {
-          label: "Bad Request",
-          bg: "bg-orange-100",
-          text: "text-orange-700",
-        };
+          label: 'Bad Request',
+          bg: 'bg-orange-100',
+          text: 'text-orange-700',
+        }
 
       case 404:
         return {
-          label: "Not Found",
-          bg: "bg-orange-100",
-          text: "text-orange-700",
-        };
+          label: 'Not Found',
+          bg: 'bg-orange-100',
+          text: 'text-orange-700',
+        }
 
       case 500:
         return {
-          label: "Server Error",
-          bg: "bg-red-100",
-          text: "text-red-700",
-        };
+          label: 'Server Error',
+          bg: 'bg-red-100',
+          text: 'text-red-700',
+        }
 
       case 503:
         return {
-          label: "Service Unavailable",
-          bg: "bg-red-100",
-          text: "text-red-700",
-        };
+          label: 'Service Unavailable',
+          bg: 'bg-red-100',
+          text: 'text-red-700',
+        }
 
       default:
         return {
-          label: "Unknown Status",
-          bg: "bg-gray-200",
-          text: "text-gray-700",
-        };
+          label: 'Unknown Status',
+          bg: 'bg-gray-200',
+          text: 'text-gray-700',
+        }
     }
-  };
+  }
 
   const handleEditorChange = (value: string) => {
-    setBody(value);
-  };
+    setBody(value)
+  }
 
   // collection logic
   const updateCollection = (
     colId: number,
     fn: (c: Collection) => Collection
   ) => {
-    setCollection((cols) => cols?.map((c) => (c.id === colId ? fn(c) : c)));
-  };
+    setCollection((cols) => cols?.map((c) => (c.id === colId ? fn(c) : c)))
+  }
 
   // folders logic
   const updateFolders = (
@@ -267,12 +270,12 @@ const Home = () => {
       hasFolder: c?.hasFolder.map((f) =>
         f?.folderId === folderId ? fn(f) : f
       ),
-    }));
-  };
+    }))
+  }
 
   const updatingReqMethod = (e: any) => {
-    const value = e?.target?.value;
-    setMethod(value);
+    const value = e?.target?.value
+    setMethod(value)
     setRequestArr((prev) =>
       prev.map((p) =>
         p.colId === CollectionId &&
@@ -281,14 +284,14 @@ const Home = () => {
           ? { ...p, method: value as RequestMethod }
           : p
       )
-    );
+    )
     updateFolders(CollectionId, FolderID, (f) => ({
       ...f,
       hasRequests: f?.hasRequests.map((r) =>
         r.reqId === RequestID ? { ...r, method: value } : r
       ),
-    }));
-  };
+    }))
+  }
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -316,13 +319,13 @@ const Home = () => {
                   r?.colId === CollectionId &&
                   r?.folderId === FolderID &&
                   r?.reqId === RequestID
-                    ? "bg-slate-200"
-                    : "bg-white"
+                    ? 'bg-slate-200'
+                    : 'bg-white'
                 } w-[300px] h-full border border-blue-200 cursor-pointer `}
               >
                 <div className="flex justify-start items-center gap-3 py-2 px-3 border-b last:border-b-0 border-slate-200 transition-colors duration-150 cursor-pointer group">
                   <span
-                    className={`${methodColors1["GET"]} font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
+                    className={`${methodColors1['GET']} font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
                   >
                     {r?.method}
                   </span>
@@ -395,14 +398,14 @@ const Home = () => {
           {/* Tabs */}
           <div className="border-b border-gray-200 mb-4">
             <div className="flex flex-wrap gap-2 md:gap-0">
-              {["params", "headers", "body"].map((tab) => (
+              {['params', 'headers', 'body'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 font-medium capitalize transition-colors ${
                     activeTab === tab
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-gray-600 hover:text-gray-800"
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
                   {tab}
@@ -414,7 +417,7 @@ const Home = () => {
           {/* Tab Content */}
           <div className="min-h-[200px]">
             {/* Params Tab */}
-            {activeTab === "params" && (
+            {activeTab === 'params' && (
               <div className="space-y-3">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -434,7 +437,7 @@ const Home = () => {
                               type="checkbox"
                               checked={param.enabled}
                               onChange={(e) =>
-                                updateParam(index, "enabled", e.target.checked)
+                                updateParam(index, 'enabled', e.target.checked)
                               }
                               className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                             />
@@ -444,7 +447,7 @@ const Home = () => {
                               type="text"
                               value={param.key}
                               onChange={(e) =>
-                                updateParam(index, "key", e.target.value)
+                                updateParam(index, 'key', e.target.value)
                               }
                               placeholder="Key"
                               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -455,7 +458,7 @@ const Home = () => {
                               type="text"
                               value={String(param.value)}
                               onChange={(e) =>
-                                updateParam(index, "value", e.target.value)
+                                updateParam(index, 'value', e.target.value)
                               }
                               placeholder="Value"
                               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -485,7 +488,7 @@ const Home = () => {
             )}
 
             {/* Headers Tab */}
-            {activeTab === "headers" && (
+            {activeTab === 'headers' && (
               <div className="space-y-3">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -505,7 +508,7 @@ const Home = () => {
                               type="checkbox"
                               checked={header.enabled}
                               onChange={(e) =>
-                                updateHeader(index, "enabled", e.target.checked)
+                                updateHeader(index, 'enabled', e.target.checked)
                               }
                               className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                             />
@@ -515,7 +518,7 @@ const Home = () => {
                               type="text"
                               value={header.key}
                               onChange={(e) =>
-                                updateHeader(index, "key", e.target.value)
+                                updateHeader(index, 'key', e.target.value)
                               }
                               placeholder="Key"
                               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -526,7 +529,7 @@ const Home = () => {
                               type="text"
                               value={String(header.value)}
                               onChange={(e) =>
-                                updateHeader(index, "value", e.target.value)
+                                updateHeader(index, 'value', e.target.value)
                               }
                               placeholder="Value"
                               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -556,38 +559,38 @@ const Home = () => {
             )}
 
             {/* Body Tab */}
-            {activeTab === "body" && (
+            {activeTab === 'body' && (
               <div className="flex flex-col w-full">
                 <div className="flex w-full">
                   <button
-                    onClick={() => setBodyMode("raw")}
+                    onClick={() => setBodyMode('raw')}
                     className={`w-[50%] mb-4  ${
-                      bodyMode === "raw"
-                        ? "text-blue-600 border-r-2 border-b-2 border-blue-600"
-                        : "text-gray-600 hover:text-gray-800"
+                      bodyMode === 'raw'
+                        ? 'text-blue-600 border-r-2 border-b-2 border-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
                     }  `}
                   >
                     Raw
                   </button>
                   <button
-                    onClick={() => setBodyMode("formData")}
+                    onClick={() => setBodyMode('formData')}
                     className={`w-[50%] mb-4  ${
-                      bodyMode === "formData"
-                        ? "text-blue-600 border-l-2 border-b-2 border-blue-600"
-                        : "text-gray-600 hover:text-gray-800"
+                      bodyMode === 'formData'
+                        ? 'text-blue-600 border-l-2 border-b-2 border-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
                     }  `}
                   >
                     Form Data
                   </button>
                 </div>
-                {bodyMode === "raw" ? (
+                {bodyMode === 'raw' ? (
                   <Resizable
                     height={editorHeight}
                     width={600}
                     onResize={(_: any, data) =>
                       setEditorHeight(data.size.height)
                     }
-                    resizeHandles={["s"]}
+                    resizeHandles={['s']}
                   >
                     <div style={{ height: editorHeight }}>
                       <Editor
@@ -595,7 +598,7 @@ const Home = () => {
                         defaultLanguage="json"
                         defaultValue={body}
                         onChange={(val: string | undefined) =>
-                          handleEditorChange(val ?? "")
+                          handleEditorChange(val ?? '')
                         }
                       />
                     </div>
@@ -623,7 +626,7 @@ const Home = () => {
                                   onChange={(e) =>
                                     updateFormData(
                                       index,
-                                      "enabled",
+                                      'enabled',
                                       e.target.checked
                                     )
                                   }
@@ -639,8 +642,8 @@ const Home = () => {
                                           ? {
                                               ...p,
                                               type: e.target.value as
-                                                | "text"
-                                                | "file",
+                                                | 'text'
+                                                | 'file',
                                             }
                                           : p
                                       )
@@ -657,7 +660,7 @@ const Home = () => {
                                   type="text"
                                   value={fd.key}
                                   onChange={(e) =>
-                                    updateFormData(index, "key", e.target.value)
+                                    updateFormData(index, 'key', e.target.value)
                                   }
                                   placeholder="Key"
                                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -667,13 +670,13 @@ const Home = () => {
                                 <input
                                   type={fd?.type}
                                   value={
-                                    fd?.type !== "file" ? String(fd?.value) : ""
+                                    fd?.type !== 'file' ? String(fd?.value) : ''
                                   }
                                   onChange={(e) =>
                                     updateFormData(
                                       index,
-                                      "value",
-                                      fd?.type === "text"
+                                      'value',
+                                      fd?.type === 'text'
                                         ? String(e.target.value)
                                         : e?.target?.files?.[0]
                                     )
@@ -718,7 +721,7 @@ const Home = () => {
                   getStatusInfo(showResponse?.status ?? -1)?.bg
                 } ${getStatusInfo(showResponse?.status ?? -1).text}`}
               >
-                {showResponse?.status}{" "}
+                {showResponse?.status}{' '}
                 {getStatusInfo(showResponse?.status ?? -1).label}
               </div>
               <div
@@ -731,14 +734,14 @@ const Home = () => {
             </div>
             <pre
               style={{
-                height: "600px",
-                overflow: "scroll",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-all",
-                background: "#1e1e1e",
-                color: "white",
-                padding: "10px",
-                borderRadius: "8px",
+                height: '600px',
+                overflow: 'scroll',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-all',
+                background: '#1e1e1e',
+                color: 'white',
+                padding: '10px',
+                borderRadius: '8px',
               }}
             >
               {JSON.stringify(showResponse?.data, null, 2)}
@@ -756,7 +759,7 @@ const Home = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
