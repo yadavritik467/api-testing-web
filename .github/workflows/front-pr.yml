@@ -1,0 +1,65 @@
+
+
+
+# name: Frontend PR - Checker
+
+# permissions:
+#   contents: write
+  
+# on:
+#   pull_request:
+#     branches: [main]
+#     paths:
+#       - "frontend/**"
+
+# jobs:
+#   build:
+#     name: Frontend Build Test
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ./frontend
+
+#     steps:
+#       - name: Checkout PR branch
+#         uses: actions/checkout@v4
+#         with:
+#           ref: ${{ github.head_ref }}
+#           fetch-depth: 0
+
+#       - name: Cache node modules  
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: "npm"
+#           cache-dependency-path: frontend/package-lock.json
+
+#       # npm ci is faster & deterministic
+#       - name: Install dependencies
+#         working-directory: frontend
+#         run: npm ci 
+
+#       - name: Run Build
+#         working-directory: frontend
+#         run: npm run build
+      
+#       - name: Run prettier
+#         working-directory: frontend
+#         run: npm run format
+
+#       - name: Commit and push changes (Formatted Code)
+#         working-directory: frontend
+#         run: |
+#           git config --global user.name ${{github.actor}}
+#           git config --global user.email ${{github.event.pull_request.user.login}}
+#           git add .
+#           git diff --cached
+#           if git diff --cached --quiet; then
+#              echo "No changes to commit"
+#           else
+#             git commit -m "chore(frontend): apply prettier formatting"
+#             git push origin HEAD:${{ github.head_ref }}
+#           fi
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
+          
