@@ -50,6 +50,8 @@ const Home = () => {
   } = useCollection()
   const [editorHeight, setEditorHeight] = useState(300) // px
 
+  const [reqId, setReqId] = useState<number>(-1)
+
   const [searchParams, setSearchParams] = useSearchParams()
   const CollectionId = Number(searchParams?.get('colId'))
   const FolderID = Number(searchParams?.get('folderId'))
@@ -156,7 +158,6 @@ const Home = () => {
         },
         {} as Record<string, string>
       )
-      console.log('formated', formatHeaders)
       setFormattedHeaders(formatHeaders)
     }
   }, [headers])
@@ -297,6 +298,15 @@ const Home = () => {
       ),
     }))
   }
+
+  const removeFromTab = (colId: number, folderId: number, rId: number) => {
+    setRequestArr((prev) =>
+      prev.filter(
+        (f) =>
+          !(f?.colId === colId && f?.folderId === folderId && f?.reqId === rId)
+      )
+    )
+  }
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -313,6 +323,8 @@ const Home = () => {
             {requestArr?.map((r, i) => (
               <div
                 key={i}
+                onMouseEnter={() => setReqId(r?.reqId)}
+                onMouseLeave={() => setReqId(-1)}
                 onClick={() =>
                   setSearchParams({
                     colId: String(r?.colId),
@@ -326,7 +338,7 @@ const Home = () => {
                   r?.reqId === RequestID
                     ? 'bg-slate-200'
                     : 'bg-white'
-                } w-[300px] h-full border border-blue-200 cursor-pointer `}
+                } w-[300px] relative h-full border border-blue-200 cursor-pointer `}
               >
                 <div className="flex justify-start items-center gap-3 py-2 px-3 border-b last:border-b-0 border-slate-200 transition-colors duration-150 cursor-pointer group">
                   <span
@@ -335,12 +347,18 @@ const Home = () => {
                     {r?.method}
                   </span>
 
-                  <p
-                    // onDoubleClick={() => changeRequestName()}
-                    className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors"
-                  >
+                  <p className="text-sm text-slate-700 flex-1 truncate group-hover:text-blue-600 transition-colors">
                     {r?.reqName}
                   </p>
+                  {reqId === r?.reqId && (
+                    <X
+                      className={`text-red-400 w-5 h-5`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeFromTab(r?.colId!, r?.folderId!, r?.reqId!)
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             ))}
