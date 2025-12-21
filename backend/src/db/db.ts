@@ -4,7 +4,7 @@ export const dbConnection = async () => {
     await mongoose.connect('mongodb://mongo:27017/api-testing-web')
     // console.log('db connected')
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return error?.message
     }
     return String(error)

@@ -10,6 +10,7 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "validate": "npm run format && npm run lint",
     "build": "npx tsc"
   },
   "keywords": [],
