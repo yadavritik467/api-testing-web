@@ -57,7 +57,7 @@ const Home = () => {
 
   const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
-  const methodColors: { [key: string]: any } = {
+  const methodColors: Record<RequestMethod,string> = {
     GET: 'bg-green-500 hover:bg-green-600',
     POST: 'bg-yellow-500 hover:bg-yellow-600',
     PUT: 'bg-blue-500 hover:bg-blue-600',
@@ -71,7 +71,7 @@ const Home = () => {
   }
 
   const removeParam = (index: number) => {
-    setParams(params.filter((_: any, i: number) => i !== index))
+    setParams(params.filter((_: unknown, i: number) => i !== index))
   }
 
   const updateParam = (
@@ -92,7 +92,7 @@ const Home = () => {
   }
 
   const removeHeader = (index: number) => {
-    setHeaders(headers.filter((_: any, i: number) => i !== index))
+    setHeaders(headers.filter((_: unknown, i: number) => i !== index))
   }
 
   const updateHeader = (
@@ -116,10 +116,10 @@ const Home = () => {
   }
 
   const removeFormData = (index: number) => {
-    setFormData(formData.filter((_: any, i: number) => i !== index))
+    setFormData(formData.filter((_: unknown, i: number) => i !== index))
   }
 
-  const updateFormData = (index: number, field: string, value: any) => {
+  const updateFormData = (index: number, field: string, value: string |number | boolean| File |undefined) => {
     setFormData((prev: KeyValueItem[]) => {
       const updated = [...prev]
       updated[index] = { ...updated[index], [field]: value }
@@ -152,6 +152,7 @@ const Home = () => {
         },
         {} as Record<string, string>
       )
+      console.log('formated',formatHeaders)
       setFormattedHeaders(formatHeaders)
     }
   }, [headers])
@@ -273,7 +274,7 @@ const Home = () => {
     }))
   }
 
-  const updatingReqMethod = (e: any) => {
+  const updatingReqMethod = (e:React.ChangeEvent<HTMLSelectElement> ) => {
     const value = e?.target?.value
     setMethod(value)
     setRequestArr((prev) =>
@@ -288,7 +289,7 @@ const Home = () => {
     updateFolders(CollectionId, FolderID, (f) => ({
       ...f,
       hasRequests: f?.hasRequests.map((r) =>
-        r.reqId === RequestID ? { ...r, method: value } : r
+        r.reqId === RequestID ? { ...r, method: value as RequestMethod } : r
       ),
     }))
   }
@@ -351,7 +352,7 @@ const Home = () => {
               <select
                 value={method}
                 onChange={(e) => updatingReqMethod(e)}
-                className={`${methodColors[method]} text-white font-semibold px-4 py-3 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 appearance-none pr-10 w-full md:w-auto`}
+                className={`${methodColors[method as RequestMethod]} text-white font-semibold px-4 py-3 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 appearance-none pr-10 w-full md:w-auto`}
               >
                 {methods.map((m) => (
                   <option key={m} value={m} className="bg-white text-gray-800">
@@ -587,7 +588,7 @@ const Home = () => {
                   <Resizable
                     height={editorHeight}
                     width={600}
-                    onResize={(_: any, data) =>
+                    onResize={(_: unknown, data) =>
                       setEditorHeight(data.size.height)
                     }
                     resizeHandles={['s']}
@@ -753,7 +754,7 @@ const Home = () => {
               Response
             </h2>
             <div className="bg-gray-100 rounded-lg p-4 min-h-[200px] text-gray-500 flex items-center justify-center">
-              Click "Send" to see the response
+              Click {'"Send"'} to see the response
             </div>
           </div>
         )}

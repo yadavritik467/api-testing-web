@@ -2,6 +2,7 @@ node_modules/
 public_html/
 dist
 
-front/node_modules/
-front/public_html/
-front/dist/
+frontend/node_modules/
+frontend/public_html/
+frontend/dist/
+frontend/.env
