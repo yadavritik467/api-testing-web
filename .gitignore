@@ -1,6 +1,6 @@
-node_modules/
-public_html/
-dist
+backend/node_modules
+backend/dist
+backend/logs
 
 frontend/node_modules/
 frontend/public_html/

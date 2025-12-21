@@ -1,6 +1,7 @@
 import cors from 'cors'
 import express, { type Request, type Response } from 'express'
 import { dbConnection } from './db/db.js'
+import logger from './utils/logger.js'
 
 const app = express()
 
@@ -20,5 +21,5 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 app.listen(port, () => {
-  // console.log(`server is running on  ${port}`)
+  logger.info(`server is running on  ${port}`)
 })
