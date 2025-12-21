@@ -1,5 +1,11 @@
-import axios from 'axios'
-import React, { createContext, ReactNode, useContext, useState } from 'react'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { Collection, Request } from '../layouts/Sidebar'
 
 export interface KeyValueItem {
@@ -9,14 +15,9 @@ export interface KeyValueItem {
   enabled: boolean
 }
 
-export interface FormDataItem extends KeyValueItem {}
-
-export interface ApiResponse {
-  status?: number
+export interface ApiResponse extends Partial<AxiosResponse> {
   time?: number
   size?: number
-  data?: any
-  headers?: any
 }
 
 export interface CollectionState {
@@ -25,7 +26,7 @@ export interface CollectionState {
   finalUrl: string
   activeTab: string
   params: KeyValueItem[]
-  formData: FormDataItem[]
+  formData: KeyValueItem[]
   formattedHeaders: Record<string, string>
   headers: KeyValueItem[]
   body: string
@@ -40,7 +41,7 @@ export interface CollectionContextType {
   finalUrl: string
   activeTab: string
   params: KeyValueItem[]
-  formData: FormDataItem[]
+  formData: KeyValueItem[]
   formattedHeaders: Record<string, string>
   headers: KeyValueItem[]
   body: string
@@ -55,7 +56,7 @@ export interface CollectionContextType {
   setFinalUrl: React.Dispatch<React.SetStateAction<string>>
   setActiveTab: React.Dispatch<React.SetStateAction<string>>
   setParams: React.Dispatch<React.SetStateAction<KeyValueItem[]>>
-  setFormData: React.Dispatch<React.SetStateAction<FormDataItem[]>>
+  setFormData: React.Dispatch<React.SetStateAction<KeyValueItem[]>>
   setFormattedHeaders: React.Dispatch<
     React.SetStateAction<Record<string, string>>
   >
@@ -100,7 +101,9 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
   const [formData, setFormData] = useState<KeyValueItem[]>([
     { type: 'text', key: '', value: '', enabled: false },
   ])
-  const [formattedHeaders, setFormattedHeaders] = useState<any>({})
+  const [formattedHeaders, setFormattedHeaders] = useState<
+    Record<string, string>
+  >({})
   const [headers, setHeaders] = useState<KeyValueItem[]>([
     { key: 'Content-Type', value: 'application/json', enabled: true },
     {
@@ -111,7 +114,9 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     },
   ])
   const [body, setBody] = useState('')
-  const [showResponse, setShowResponse] = useState<any>(null)
+  const [showResponse, setShowResponse] = useState<
+    ApiResponse | AxiosError | null
+  >(null)
   const [bodyMode, setBodyMode] = useState<'raw' | 'formData'>('raw')
 
   const [requestArr, setRequestArr] = useState<Request[]>([])
@@ -138,6 +143,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
 
   const GetMethod = async () => {
     try {
+      console.log('exe')
       const start = performance.now()
       const data = await axios.get(finalUrl, {
         headers: {
@@ -148,11 +154,23 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       const end = performance.now()
       const duration = end - start
       setShowResponse({ ...data, time: Math.round(duration) })
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError
+
       // console.log("error", error);
-      setShowResponse(error?.response?.data)
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
+        errorData.time = 0
+        setShowResponse(errorData)
+      } else {
+        setShowResponse(error)
+      }
     }
   }
+
+  useEffect(() => {
+    console.log('show res', showResponse)
+  }, [showResponse])
 
   const PostMethod = async () => {
     try {
@@ -166,9 +184,16 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       })
 
       setShowResponse(data)
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError
       // console.log("error", error);
-      setShowResponse(error?.response?.data)
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
+        errorData.time = 0
+        setShowResponse(errorData)
+      } else {
+        setShowResponse(error)
+      }
     }
   }
 
@@ -184,9 +209,16 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       })
 
       setShowResponse(data)
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError
       // console.log("error", error);
-      setShowResponse(error?.response?.data)
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
+        errorData.time = 0
+        setShowResponse(errorData)
+      } else {
+        setShowResponse(error)
+      }
     }
   }
 
@@ -202,9 +234,16 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       })
 
       setShowResponse(data)
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError
       // console.log("error", error);
-      setShowResponse(error?.response?.data)
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
+        errorData.time = 0
+        setShowResponse(errorData)
+      } else {
+        setShowResponse(error)
+      }
     }
   }
 
@@ -218,9 +257,16 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       })
 
       setShowResponse(data)
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError
       // console.log("error", error);
-      setShowResponse(error?.response?.data)
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
+        errorData.time = 0
+        setShowResponse(errorData)
+      } else {
+        setShowResponse(error)
+      }
     }
   }
 

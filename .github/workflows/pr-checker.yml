@@ -59,6 +59,7 @@ jobs:
         run: |
           npm ci
           npm run format:check
+          npm run lint
           npm run build
 
       # - name: Commit changes
@@ -104,6 +105,7 @@ jobs:
         run: |
           npm ci
           npm run format:check
+          npm run lint
           npm run build
 
       # - name: Commit changes

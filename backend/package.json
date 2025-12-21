@@ -6,26 +6,34 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "format": "prettier --write .",
     "format:check": "prettier . --check",
-    "build": "npx tsc"
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "npx tsc",
+    "validate": "rimraf dist && rimraf logs && npm run format && npm run lint && npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.1",
+    "eslint": "^9.39.2",
     "prettier": "^3.7.4",
+    "rimraf": "^6.1.2",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mongoose": "^9.0.0",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "winston": "^3.19.0"
   }
 }

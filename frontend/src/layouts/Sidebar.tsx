@@ -28,7 +28,7 @@ export interface Collection {
   hasFolder: Folder[]
 }
 
-export const methodColors1: { [key: string]: any } = {
+export const methodColors1: Record<RequestMethod, string> = {
   GET: 'text-green-500',
   POST: 'text-yellow-500',
   PUT: 'text-blue-500',
@@ -38,7 +38,7 @@ export const methodColors1: { [key: string]: any } = {
 
 const Sidebar = () => {
   const { collection, setCollection, setRequestArr } = useCollection()
-  const [_, setSearchParams] = useSearchParams()
+  const [, setSearchParams] = useSearchParams()
 
   useEffect(() => {
     const stored: Collection[] = JSON.parse(
@@ -173,7 +173,7 @@ const Sidebar = () => {
     updateCollection(colId, (c) => ({
       ...c,
       hasFolder: [
-        ...c?.hasFolder,
+        ...(c?.hasFolder || []),
         {
           isEditing: false,
           folderId: c?.hasFolder?.length + 1,
@@ -233,7 +233,7 @@ const Sidebar = () => {
     updateFolders(colId, folderId, (f) => ({
       ...f,
       hasRequests: [
-        ...f?.hasRequests,
+        ...(f?.hasRequests || []),
         {
           isEditing: false,
           method: 'GET',
@@ -471,7 +471,7 @@ const Sidebar = () => {
                           >
                             <span
                               className={`${
-                                methodColors1[req?.method]
+                                methodColors1[req?.method as RequestMethod]
                               } font-bold text-xs px-2 py-1 rounded bg-white border border-current min-w-[60px] text-center`}
                             >
                               {req?.method}

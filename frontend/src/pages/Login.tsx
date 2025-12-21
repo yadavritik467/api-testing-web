@@ -19,7 +19,7 @@ const Login = () => {
 
   const navigate = useNavigate()
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     setLoading(true)
