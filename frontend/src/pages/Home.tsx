@@ -57,7 +57,7 @@ const Home = () => {
 
   const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
-  const methodColors: Record<RequestMethod,string> = {
+  const methodColors: Record<RequestMethod, string> = {
     GET: 'bg-green-500 hover:bg-green-600',
     POST: 'bg-yellow-500 hover:bg-yellow-600',
     PUT: 'bg-blue-500 hover:bg-blue-600',
@@ -119,7 +119,11 @@ const Home = () => {
     setFormData(formData.filter((_: unknown, i: number) => i !== index))
   }
 
-  const updateFormData = (index: number, field: string, value: string |number | boolean| File |undefined) => {
+  const updateFormData = (
+    index: number,
+    field: string,
+    value: string | number | boolean | File | undefined
+  ) => {
     setFormData((prev: KeyValueItem[]) => {
       const updated = [...prev]
       updated[index] = { ...updated[index], [field]: value }
@@ -152,7 +156,7 @@ const Home = () => {
         },
         {} as Record<string, string>
       )
-      console.log('formated',formatHeaders)
+      console.log('formated', formatHeaders)
       setFormattedHeaders(formatHeaders)
     }
   }, [headers])
@@ -274,7 +278,7 @@ const Home = () => {
     }))
   }
 
-  const updatingReqMethod = (e:React.ChangeEvent<HTMLSelectElement> ) => {
+  const updatingReqMethod = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e?.target?.value
     setMethod(value)
     setRequestArr((prev) =>

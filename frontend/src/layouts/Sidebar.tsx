@@ -28,7 +28,7 @@ export interface Collection {
   hasFolder: Folder[]
 }
 
-export const methodColors1: Record< RequestMethod ,string> = {
+export const methodColors1: Record<RequestMethod, string> = {
   GET: 'text-green-500',
   POST: 'text-yellow-500',
   PUT: 'text-blue-500',
@@ -38,7 +38,7 @@ export const methodColors1: Record< RequestMethod ,string> = {
 
 const Sidebar = () => {
   const { collection, setCollection, setRequestArr } = useCollection()
-  const [ , setSearchParams] = useSearchParams()
+  const [, setSearchParams] = useSearchParams()
 
   useEffect(() => {
     const stored: Collection[] = JSON.parse(

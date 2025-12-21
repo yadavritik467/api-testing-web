@@ -1,5 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { Collection, Request } from '../layouts/Sidebar'
 
 export interface KeyValueItem {
@@ -108,7 +114,9 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     },
   ])
   const [body, setBody] = useState('')
-  const [showResponse, setShowResponse] = useState<ApiResponse  |AxiosError| null>(null)
+  const [showResponse, setShowResponse] = useState<
+    ApiResponse | AxiosError | null
+  >(null)
   const [bodyMode, setBodyMode] = useState<'raw' | 'formData'>('raw')
 
   const [requestArr, setRequestArr] = useState<Request[]>([])
@@ -148,21 +156,21 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       setShowResponse({ ...data, time: Math.round(duration) })
     } catch (err) {
       const error = err as AxiosError
-      
+
       // console.log("error", error);
-      if(error?.response){
-        const  errorData =error.response as ApiResponse
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
         errorData.time = 0
         setShowResponse(errorData)
-      }else{
+      } else {
         setShowResponse(error)
       }
     }
   }
 
-  useEffect(()=>{
-    console.log('show res',showResponse)
-  },[showResponse])
+  useEffect(() => {
+    console.log('show res', showResponse)
+  }, [showResponse])
 
   const PostMethod = async () => {
     try {
@@ -179,11 +187,11 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     } catch (err) {
       const error = err as AxiosError
       // console.log("error", error);
-      if(error?.response){
-        const  errorData =error.response as ApiResponse
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
         errorData.time = 0
         setShowResponse(errorData)
-      }else{
+      } else {
         setShowResponse(error)
       }
     }
@@ -204,11 +212,11 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     } catch (err) {
       const error = err as AxiosError
       // console.log("error", error);
-      if(error?.response){
-        const  errorData =error.response as ApiResponse
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
         errorData.time = 0
         setShowResponse(errorData)
-      }else{
+      } else {
         setShowResponse(error)
       }
     }
@@ -229,11 +237,11 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     } catch (err) {
       const error = err as AxiosError
       // console.log("error", error);
-      if(error?.response){
-        const  errorData =error.response as ApiResponse
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
         errorData.time = 0
         setShowResponse(errorData)
-      }else{
+      } else {
         setShowResponse(error)
       }
     }
@@ -252,11 +260,11 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     } catch (err) {
       const error = err as AxiosError
       // console.log("error", error);
-      if(error?.response){
-        const  errorData =error.response as ApiResponse
+      if (error?.response) {
+        const errorData = error.response as ApiResponse
         errorData.time = 0
         setShowResponse(errorData)
-      }else{
+      } else {
         setShowResponse(error)
       }
     }
