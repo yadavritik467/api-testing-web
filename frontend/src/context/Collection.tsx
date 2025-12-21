@@ -1,12 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import React, { createContext, ReactNode, useContext, useState } from 'react'
 import { Collection, Request } from '../layouts/Sidebar'
+import { ApiHandler } from '../utils/utils'
 
 export interface KeyValueItem {
   type?: 'text' | 'file'
@@ -15,7 +10,7 @@ export interface KeyValueItem {
   enabled: boolean
 }
 
-export interface ApiResponse extends Partial<AxiosResponse> {
+export interface ApiResponse<T = unknown> extends Partial<AxiosResponse<T>> {
   time?: number
   size?: number
 }
@@ -32,6 +27,7 @@ export interface CollectionState {
   body: string
   showResponse: ApiResponse | null
   bodyMode: 'raw' | 'formData'
+  loading: boolean
 }
 
 export interface CollectionContextType {
@@ -121,6 +117,8 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
 
   const [requestArr, setRequestArr] = useState<Request[]>([])
 
+  const [loading, setLoading] = useState<boolean>(false)
+
   //   api handler
 
   const createFormData = () => {
@@ -141,133 +139,74 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     return bodyMode === 'raw' ? { ...JSON.parse(body) } : createFormData()
   }
 
-  const GetMethod = async () => {
-    try {
-      console.log('exe')
-      const start = performance.now()
-      const data = await axios.get(finalUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...formattedHeaders,
-        },
-      })
-      const end = performance.now()
-      const duration = end - start
-      setShowResponse({ ...data, time: Math.round(duration) })
-    } catch (err) {
-      const error = err as AxiosError
-
-      // console.log("error", error);
-      if (error?.response) {
-        const errorData = error.response as ApiResponse
-        errorData.time = 0
-        setShowResponse(errorData)
-      } else {
-        setShowResponse(error)
-      }
+  const getHeaders = (isFormData = false) => {
+    return {
+      ...formattedHeaders,
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     }
   }
 
-  useEffect(() => {
-    console.log('show res', showResponse)
-  }, [showResponse])
+  const GetMethod = async () => {
+    await ApiHandler({
+      apiCall: () => axios.get(finalUrl, { headers: getHeaders() }),
+      loadingOn: () => setLoading(true),
+      loadingOff: () => setLoading(false),
+      setter: setShowResponse,
+    })
+  }
 
   const PostMethod = async () => {
-    try {
-      const payload = sendBodyInAPi()
-      const isFormData = payload instanceof FormData
-      const data = await axios.post(finalUrl, payload, {
-        headers: {
-          ...formattedHeaders,
-          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        },
-      })
-
-      setShowResponse(data)
-    } catch (err) {
-      const error = err as AxiosError
-      // console.log("error", error);
-      if (error?.response) {
-        const errorData = error.response as ApiResponse
-        errorData.time = 0
-        setShowResponse(errorData)
-      } else {
-        setShowResponse(error)
-      }
-    }
+    const payload = sendBodyInAPi()
+    const isFormData = payload instanceof FormData
+    await ApiHandler({
+      apiCall: () =>
+        axios.post(finalUrl, payload, {
+          headers: getHeaders(isFormData),
+        }),
+      loadingOn: () => setLoading(true),
+      loadingOff: () => setLoading(false),
+      setter: setShowResponse,
+    })
   }
 
   const PutMethod = async () => {
-    try {
-      const payload = sendBodyInAPi()
-      const isFormData = payload instanceof FormData
-      const data = await axios.put(finalUrl, payload, {
-        headers: {
-          ...formattedHeaders,
-          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        },
-      })
-
-      setShowResponse(data)
-    } catch (err) {
-      const error = err as AxiosError
-      // console.log("error", error);
-      if (error?.response) {
-        const errorData = error.response as ApiResponse
-        errorData.time = 0
-        setShowResponse(errorData)
-      } else {
-        setShowResponse(error)
-      }
-    }
+    const payload = sendBodyInAPi()
+    const isFormData = payload instanceof FormData
+    await ApiHandler({
+      apiCall: () =>
+        axios.put(finalUrl, payload, {
+          headers: getHeaders(isFormData),
+        }),
+      loadingOn: () => setLoading(true),
+      loadingOff: () => setLoading(false),
+      setter: setShowResponse,
+    })
   }
 
   const PatchMethod = async () => {
-    try {
-      const payload = sendBodyInAPi()
-      const isFormData = payload instanceof FormData
-      const data = await axios.patch(finalUrl, payload, {
-        headers: {
-          ...formattedHeaders,
-          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        },
-      })
-
-      setShowResponse(data)
-    } catch (err) {
-      const error = err as AxiosError
-      // console.log("error", error);
-      if (error?.response) {
-        const errorData = error.response as ApiResponse
-        errorData.time = 0
-        setShowResponse(errorData)
-      } else {
-        setShowResponse(error)
-      }
-    }
+    const payload = sendBodyInAPi()
+    const isFormData = payload instanceof FormData
+    await ApiHandler({
+      apiCall: () =>
+        axios.patch(finalUrl, payload, {
+          headers: getHeaders(isFormData),
+        }),
+      loadingOn: () => setLoading(true),
+      loadingOff: () => setLoading(false),
+      setter: setShowResponse,
+    })
   }
 
   const DeleteMethod = async () => {
-    try {
-      const data = await axios.delete(finalUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...formattedHeaders,
-        },
-      })
-
-      setShowResponse(data)
-    } catch (err) {
-      const error = err as AxiosError
-      // console.log("error", error);
-      if (error?.response) {
-        const errorData = error.response as ApiResponse
-        errorData.time = 0
-        setShowResponse(errorData)
-      } else {
-        setShowResponse(error)
-      }
-    }
+    await ApiHandler({
+      apiCall: () =>
+        axios.delete(finalUrl, {
+          headers: getHeaders(),
+        }),
+      loadingOn: () => setLoading(true),
+      loadingOff: () => setLoading(false),
+      setter: setShowResponse,
+    })
   }
 
   const all_states = {
@@ -282,6 +221,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     body,
     showResponse,
     bodyMode,
+    loading,
     requestArr,
     collection,
   }
