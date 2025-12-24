@@ -15,19 +15,23 @@ const Home = () => {
   const {
     // states,
     method,
+    envVal,
     baseUrl,
     finalUrl,
     activeTab,
     params,
     formData,
     headers,
+    globalHeaders,
     body,
     showResponse,
     bodyMode,
     requestArr,
+    environments,
 
     // states update func
     setMethod,
+    setEnvVal,
     setBaseUrl,
     setFinalUrl,
     setActiveTab,
@@ -39,7 +43,7 @@ const Home = () => {
     setBodyMode,
     setRequestArr,
     setCollection,
-
+    isGlobalHeaders,
     // apis handler
 
     GetMethod,
@@ -51,6 +55,8 @@ const Home = () => {
   const [editorHeight, setEditorHeight] = useState(300) // px
 
   const [reqId, setReqId] = useState<number>(-1)
+
+  const enabledEnvs = environments.filter((e) => e.enabled)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const CollectionId = Number(searchParams?.get('colId'))
@@ -90,11 +96,11 @@ const Home = () => {
 
   // header logic
   const addHeader = () => {
-    setHeaders([...headers, { key: '', value: '', enabled: false }])
+    setHeaders((p) => [...p, { key: '', value: '', enabled: false }])
   }
 
   const removeHeader = (index: number) => {
-    setHeaders(headers.filter((_: unknown, i: number) => i !== index))
+    setHeaders((p) => p.filter((_: unknown, i: number) => i !== index))
   }
 
   const updateHeader = (
@@ -111,14 +117,14 @@ const Home = () => {
 
   // form data logic
   const addFormData = () => {
-    setFormData([
-      ...formData,
+    setFormData((p) => [
+      ...p,
       { type: 'text', key: '', value: '', enabled: false },
     ])
   }
 
   const removeFormData = (index: number) => {
-    setFormData(formData.filter((_: unknown, i: number) => i !== index))
+    setFormData((p) => p.filter((_: unknown, i: number) => i !== index))
   }
 
   const updateFormData = (
@@ -126,7 +132,7 @@ const Home = () => {
     field: string,
     value: string | number | boolean | File | undefined
   ) => {
-    setFormData((prev: KeyValueItem[]) => {
+    setFormData((prev) => {
       const updated = [...prev]
       updated[index] = { ...updated[index], [field]: value }
       return updated
@@ -149,18 +155,24 @@ const Home = () => {
     return activeParams ? `${baseUrl}?${activeParams}` : baseUrl
   }
 
+  const createFromateHeaders = (d: KeyValueItem[]) => {
+    const formatHeaders = d.reduce(
+      (acc, item) => {
+        if (item?.enabled) acc[item.key] = String(item.value)
+        return acc
+      },
+      {} as Record<string, string>
+    )
+    return formatHeaders
+  }
+
   useEffect(() => {
-    if (headers) {
-      const formatHeaders = headers.reduce(
-        (acc, item) => {
-          if (item?.enabled) acc[item.key] = String(item.value)
-          return acc
-        },
-        {} as Record<string, string>
-      )
-      setFormattedHeaders(formatHeaders)
+    if (isGlobalHeaders()) {
+      setFormattedHeaders(createFromateHeaders(globalHeaders))
+    } else if (headers && !isGlobalHeaders()) {
+      setFormattedHeaders(createFromateHeaders(headers))
     }
-  }, [headers])
+  }, [headers, globalHeaders])
 
   useEffect(() => {
     const updated = generateParamsUrl()
@@ -355,7 +367,11 @@ const Home = () => {
                       className={`text-red-400 w-5 h-5`}
                       onClick={(e) => {
                         e.stopPropagation()
-                        removeFromTab(r?.colId!, r?.folderId!, r?.reqId!)
+                        removeFromTab(
+                          r?.colId as number,
+                          r?.folderId as number,
+                          r?.reqId as number
+                        )
                       }}
                     />
                   )}
@@ -398,6 +414,45 @@ const Home = () => {
                 </svg>
               </div>
             </div>
+
+            {/* Environments */}
+            {enabledEnvs?.length ? (
+              <div className="relative">
+                <select
+                  value={envVal ?? 'Select env'}
+                  onChange={(e) => setEnvVal(e.target.value)}
+                  className={` bg-transparent text-gray-600 font-semibold px-4 py-3 rounded-lg cursor-pointer focus:outline-none border-2 border-blue-500  focus:ring-blue-500 appearance-none pr-10 w-full md:w-auto`}
+                >
+                  <option value="" className="bg-white text-gray-800">
+                    Select env
+                  </option>
+                  {enabledEnvs.map((e, i) => (
+                    <option
+                      key={i}
+                      value={e?.value as string}
+                      className="bg-white text-gray-800"
+                    >
+                      {e?.key}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            ) : null}
 
             {/* URL Input */}
             <input
@@ -529,21 +584,25 @@ const Home = () => {
                           <td className="py-1">
                             <input
                               type="checkbox"
+                              disabled={isGlobalHeaders()}
                               checked={header.enabled}
                               onChange={(e) =>
                                 updateHeader(index, 'enabled', e.target.checked)
                               }
+                              style={{ opacity: isGlobalHeaders() ? 0.5 : 1 }}
                               className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                             />
                           </td>
                           <td className="py-1 px-2">
                             <input
                               type="text"
+                              disabled={isGlobalHeaders()}
                               value={header.key}
                               onChange={(e) =>
                                 updateHeader(index, 'key', e.target.value)
                               }
                               placeholder="Key"
+                              style={{ opacity: isGlobalHeaders() ? 0.5 : 1 }}
                               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                           </td>
@@ -555,12 +614,16 @@ const Home = () => {
                                 updateHeader(index, 'value', e.target.value)
                               }
                               placeholder="Value"
+                              disabled={isGlobalHeaders()}
+                              style={{ opacity: isGlobalHeaders() ? 0.5 : 1 }}
                               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                           </td>
                           <td className="py-1">
                             <button
                               onClick={() => removeHeader(index)}
+                              disabled={isGlobalHeaders()}
+                              style={{ opacity: isGlobalHeaders() ? 0.5 : 1 }}
                               className="text-gray-400 hover:text-red-600 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                               <X className="h-4 w-4" />
@@ -573,6 +636,8 @@ const Home = () => {
                 </div>
                 <button
                   onClick={addHeader}
+                  disabled={isGlobalHeaders()}
+                  style={{ opacity: isGlobalHeaders() ? 0.5 : 1 }}
                   className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
                 >
                   <Plus className="h-4 w-4" />
