@@ -31,7 +31,7 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
-        run: npm run build
+        run: ls -R && npm run build
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/scp-action@master
@@ -53,6 +53,5 @@ jobs:
           script: |
             cd ~/api-testing-web
             npm install --omit=dev
-            ls -R dist  
             pm2 restart api-testing-web || pm2 start dist/index.js --name api-testing-web
             pm2 save
