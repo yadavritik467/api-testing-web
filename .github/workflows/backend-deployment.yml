@@ -33,25 +33,25 @@ jobs:
         working-directory: frontend
         run: ls -R && npm run build
 
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "backend/dist/**,backend/package.json,backend/package-lock.json"
-          target: "~/api-testing-web/"
-          strip_components: 1
-          overwrite: true
+    #   - name: Deploy to EC2 via SSH
+    #     uses: appleboy/scp-action@master
+    #     with:
+    #       host: ${{ secrets.EC2_HOST }}
+    #       username: ec2-user
+    #       key: ${{ secrets.EC2_SSH_KEY }}
+    #       source: "backend/dist/**,backend/package.json,backend/package-lock.json"
+    #       target: "~/api-testing-web/"
+    #       strip_components: 1
+    #       overwrite: true
 
-      - name: Restart PM2 on EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ~/api-testing-web
-            npm install --omit=dev
-            pm2 restart api-testing-web || pm2 start dist/index.js --name api-testing-web
-            pm2 save
+    #   - name: Restart PM2 on EC2
+    #     uses: appleboy/ssh-action@master
+    #     with:
+    #       host: ${{ secrets.EC2_HOST }}
+    #       username: ec2-user
+    #       key: ${{ secrets.EC2_SSH_KEY }}
+    #       script: |
+    #         cd ~/api-testing-web
+    #         npm install --omit=dev
+    #         pm2 restart api-testing-web || pm2 start dist/index.js --name api-testing-web
+    #         pm2 save
