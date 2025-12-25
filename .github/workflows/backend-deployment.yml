@@ -53,5 +53,6 @@ jobs:
           script: |
             cd ~/api-testing-web
             npm install --omit=dev
-            pm2 restart api-testing-web || pm2 start dist/index.js --name api-testing-web
+            pm2 delete api-testing-web || true
+            pm2 start dist/index.js --name api-testing-web
             pm2 save
