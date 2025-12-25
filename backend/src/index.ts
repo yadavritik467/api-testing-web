@@ -5,7 +5,7 @@ import logger from './utils/logger.js'
 
 const app = express()
 
-const port = 443
+const port = 80
 app.use(
   cors({
     origin: 'http://localhost:5174',
