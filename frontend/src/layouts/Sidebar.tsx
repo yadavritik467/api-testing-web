@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronRight, Folder, Plus, Trash } from 'lucide-react'
 import { useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useCollection } from '../context/Collection'
 
 export type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -38,7 +38,7 @@ export const methodColors1: Record<RequestMethod, string> = {
 
 const Sidebar = () => {
   const { collection, setCollection, setRequestArr } = useCollection()
-  const [, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const stored: Collection[] = JSON.parse(
@@ -292,10 +292,9 @@ const Sidebar = () => {
     folderId: number,
     request: Request
   ) => {
-    setSearchParams({
-      colId: String(colId),
-      folderId: String(folderId),
-      reqId: String(request.reqId),
+    navigate({
+      pathname: `/collection/${colId}/request`,
+      search: `?colId=${colId}&folderId=${folderId}&reqId=${request.reqId}`,
     })
     setRequestArr((prev) => {
       const isExist = prev?.some(
@@ -357,6 +356,7 @@ const Sidebar = () => {
               ) : (
                 <div
                   onDoubleClick={() => changeCollectionName(c?.id)}
+                  onClick={() => navigate(`/collection/${c?.id}`)}
                   className="w-full flex justify-between items-center group"
                 >
                   <p className="font-semibold text-slate-700 flex-1">

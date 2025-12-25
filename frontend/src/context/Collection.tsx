@@ -1,5 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import React, { createContext, ReactNode, useContext, useState } from 'react'
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { Collection, Request } from '../layouts/Sidebar'
 import { ApiHandler } from '../utils/utils'
 
@@ -33,6 +39,7 @@ export interface CollectionState {
 export interface CollectionContextType {
   // all state
   method: string
+  envVal: string
   baseUrl: string
   finalUrl: string
   activeTab: string
@@ -40,6 +47,8 @@ export interface CollectionContextType {
   formData: KeyValueItem[]
   formattedHeaders: Record<string, string>
   headers: KeyValueItem[]
+  globalHeaders: KeyValueItem[]
+  environments: KeyValueItem[]
   body: string
   showResponse: ApiResponse | null
   bodyMode: 'raw' | 'formData'
@@ -48,6 +57,7 @@ export interface CollectionContextType {
 
   // update functions
   setMethod: React.Dispatch<React.SetStateAction<string>>
+  setEnvVal: React.Dispatch<React.SetStateAction<string>>
   setBaseUrl: React.Dispatch<React.SetStateAction<string>>
   setFinalUrl: React.Dispatch<React.SetStateAction<string>>
   setActiveTab: React.Dispatch<React.SetStateAction<string>>
@@ -57,11 +67,15 @@ export interface CollectionContextType {
     React.SetStateAction<Record<string, string>>
   >
   setHeaders: React.Dispatch<React.SetStateAction<KeyValueItem[]>>
+  setGlobalHeaders: React.Dispatch<React.SetStateAction<KeyValueItem[]>>
+  setEnvironments: React.Dispatch<React.SetStateAction<KeyValueItem[]>>
   setBody: React.Dispatch<React.SetStateAction<string>>
   setShowResponse: React.Dispatch<React.SetStateAction<ApiResponse | null>>
   setBodyMode: React.Dispatch<React.SetStateAction<'raw' | 'formData'>>
   setRequestArr: React.Dispatch<React.SetStateAction<Request[]>>
   setCollection: React.Dispatch<React.SetStateAction<Collection[]>>
+
+  isGlobalHeaders: () => boolean
 
   //api controller functions
   GetMethod: () => Promise<void>
@@ -88,7 +102,9 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [collection, setCollection] = useState<Collection[]>([])
   const [method, setMethod] = useState('GET')
-  const [baseUrl, setBaseUrl] = useState('https://dummyjson.com/products')
+  const [envVal, setEnvVal] = useState('')
+  // const [baseUrl, setBaseUrl] = useState('https://dummyjson.com/products')
+  const [baseUrl, setBaseUrl] = useState('')
   const [finalUrl, setFinalUrl] = useState(baseUrl)
   const [activeTab, setActiveTab] = useState('params')
   const [params, setParams] = useState<KeyValueItem[]>([
@@ -109,6 +125,29 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
       enabled: true,
     },
   ])
+  const [globalHeaders, setGlobalHeaders] = useState<KeyValueItem[]>(
+    JSON.parse(localStorage.getItem('globalHeaders') as string) || [
+      {
+        key: '',
+        value: '',
+        enabled: false,
+      },
+    ]
+  )
+  const [environments, setEnvironments] = useState<KeyValueItem[]>(
+    JSON.parse(localStorage.getItem('environments') as string) || [
+      {
+        key: 'PROD_URL',
+        value: 'https://prod.com',
+        enabled: true,
+      },
+      {
+        key: 'DEV_URL',
+        value: 'https://dev.com',
+        enabled: true,
+      },
+    ]
+  )
   const [body, setBody] = useState('')
   const [showResponse, setShowResponse] = useState<
     ApiResponse | AxiosError | null
@@ -118,8 +157,6 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
   const [requestArr, setRequestArr] = useState<Request[]>([])
 
   const [loading, setLoading] = useState<boolean>(false)
-
-  //   api handler
 
   const createFormData = () => {
     const valid = formData.filter((f) => f.enabled && f.key.trim() !== '')
@@ -146,9 +183,27 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
+  const isGlobalHeaders = () => {
+    return globalHeaders.filter((h) => h.enabled === true)?.length > 0
+  }
+
+  useEffect(() => {
+    if (globalHeaders?.length) {
+      localStorage.setItem('globalHeaders', JSON.stringify(globalHeaders))
+    }
+    if (environments?.length) {
+      localStorage.setItem('environments', JSON.stringify(environments))
+    }
+  }, [globalHeaders, environments])
+
+  const generateUrlWithEnv = () => {
+    return envVal !== '' ? envVal + finalUrl : finalUrl
+  }
+
+  //   api handler
   const GetMethod = async () => {
     await ApiHandler({
-      apiCall: () => axios.get(finalUrl, { headers: getHeaders() }),
+      apiCall: () => axios.get(generateUrlWithEnv(), { headers: getHeaders() }),
       loadingOn: () => setLoading(true),
       loadingOff: () => setLoading(false),
       setter: setShowResponse,
@@ -160,7 +215,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     const isFormData = payload instanceof FormData
     await ApiHandler({
       apiCall: () =>
-        axios.post(finalUrl, payload, {
+        axios.post(generateUrlWithEnv(), payload, {
           headers: getHeaders(isFormData),
         }),
       loadingOn: () => setLoading(true),
@@ -174,7 +229,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     const isFormData = payload instanceof FormData
     await ApiHandler({
       apiCall: () =>
-        axios.put(finalUrl, payload, {
+        axios.put(generateUrlWithEnv(), payload, {
           headers: getHeaders(isFormData),
         }),
       loadingOn: () => setLoading(true),
@@ -188,7 +243,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     const isFormData = payload instanceof FormData
     await ApiHandler({
       apiCall: () =>
-        axios.patch(finalUrl, payload, {
+        axios.patch(generateUrlWithEnv(), payload, {
           headers: getHeaders(isFormData),
         }),
       loadingOn: () => setLoading(true),
@@ -200,7 +255,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
   const DeleteMethod = async () => {
     await ApiHandler({
       apiCall: () =>
-        axios.delete(finalUrl, {
+        axios.delete(generateUrlWithEnv(), {
           headers: getHeaders(),
         }),
       loadingOn: () => setLoading(true),
@@ -211,6 +266,7 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
 
   const all_states = {
     method,
+    envVal,
     baseUrl,
     finalUrl,
     activeTab,
@@ -218,15 +274,18 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     formData,
     formattedHeaders,
     headers,
+    globalHeaders,
     body,
     showResponse,
     bodyMode,
     loading,
     requestArr,
     collection,
+    environments,
   }
   const all_states_update_func = {
     setMethod,
+    setEnvVal,
     setBaseUrl,
     setFinalUrl,
     setActiveTab,
@@ -234,11 +293,14 @@ export const CollectionProvider: React.FC<{ children: ReactNode }> = ({
     setFormData,
     setFormattedHeaders,
     setHeaders,
+    setGlobalHeaders,
     setBody,
     setShowResponse,
     setBodyMode,
     setRequestArr,
     setCollection,
+    isGlobalHeaders,
+    setEnvironments,
   }
 
   const all_api_controllers = {
