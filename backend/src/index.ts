@@ -21,5 +21,6 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 app.listen(port, () => {
+  
   logger.info(`server is running on  ${port}`)
 })

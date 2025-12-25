@@ -10,13 +10,28 @@ const logger = winston.createLogger({
     })
   ),
   transports: [
-    // in development to show the output in terminal
-    new winston.transports.Console(),
-
-    // 2. in production to save the error in files
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
+    // in production to save the error in files
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      maxsize: 10242880,
+      maxFiles: 5,
+    }),
+    new winston.transports.File({
+      filename: 'logs/combined.log',
+      maxsize: 10242880,
+      maxFiles: 5,
+    }),
   ],
 })
+
+// in development to show the output in terminal
+if (process.env.NODE_ENV === 'DEV') {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  )
+}
 
 export default logger
