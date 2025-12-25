@@ -1,6 +1,6 @@
 import cors from 'cors'
 import express, { type Request, type Response } from 'express'
-import { dbConnection } from './db/db.js'
+// import { dbConnection } from './db/db.js'
 import logger from './utils/logger.js'
 
 const app = express()
@@ -12,7 +12,7 @@ app.use(
   })
 )
 
-dbConnection()
+// dbConnection()
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
