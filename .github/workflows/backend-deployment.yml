@@ -54,5 +54,5 @@ jobs:
             cd ~/api-testing-web
             npm install --omit=dev
             ls -R dist  
-            pm2 restart api-testing-backend-api || pm2 start dist/index.js --name api-testing-backend-api
+            pm2 restart api-testing-web || pm2 start dist/index.js --name api-testing-web
             pm2 save
