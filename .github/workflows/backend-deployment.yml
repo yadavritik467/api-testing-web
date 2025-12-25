@@ -42,6 +42,7 @@ jobs:
           source: "backend/dist/**,backend/package.json,backend/package-lock.json"
           target: "~/api-testing-web/"
           strip_components: 1
+          overwrite: true
 
       - name: Restart PM2 on EC2
         uses: appleboy/ssh-action@master
@@ -50,7 +51,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/api-testing-web-backend
+            cd ~/api-testing-web
             npm install --omit=dev
             ls -R dist  
             pm2 restart api-testing-backend-api || pm2 start dist/index.js --name api-testing-backend-api
