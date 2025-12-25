@@ -20,6 +20,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('hii from EC2 !!')
 })
 
-app.listen(port, () => {
+app.listen(port,'0.0.0.0', () => {
   logger.info(`server is running on  ${port}`)
 })
