@@ -2,13 +2,17 @@ import cors from 'cors'
 import express, { type Request, type Response } from 'express'
 // import { dbConnection } from './db/db.js'
 import logger from './utils/logger.js'
+import { configDotenv } from 'dotenv'
+import { FRONT_URL, PORT } from './config/environment.js'
+import { errorMiddleware } from './middleware/errorMiddleware.js'
+
+configDotenv({ path: './.env' })
 
 const app = express()
 
-const port = 4500
 app.use(
   cors({
-    origin: 'http://localhost:5174',
+    origin: FRONT_URL,
   })
 )
 
@@ -16,11 +20,11 @@ app.use(
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
+app.use(errorMiddleware)
 app.get('/', (req: Request, res: Response) => {
   res.send('hii from EC2 !!')
 })
 
-app.listen(port, () => {
-  
-  logger.info(`server is running on  ${port}`)
+app.listen(PORT, () => {
+  logger.info(`server is running on  ${PORT}`)
 })
