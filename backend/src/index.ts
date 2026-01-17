@@ -1,10 +1,11 @@
 import cors from 'cors'
 import express, { type Request, type Response } from 'express'
-// import { dbConnection } from './db/db.js'
+import { dbConnection } from './db/db.js'
 import logger from './utils/logger.js'
 import { configDotenv } from 'dotenv'
 import { FRONT_URL, PORT } from './config/environment.js'
 import { errorMiddleware } from './middleware/errorMiddleware.js'
+import  userRoutes from './routes/user.route.js'
 
 configDotenv({ path: './.env' })
 
@@ -16,9 +17,11 @@ app.use(
   })
 )
 
-// dbConnection()
+dbConnection()
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
+
+app.use("/api/v1",userRoutes)
 
 app.use(errorMiddleware)
 app.get('/', (req: Request, res: Response) => {
