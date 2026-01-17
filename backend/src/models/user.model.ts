@@ -1,10 +1,6 @@
 import mongoose from 'mongoose'
+import type { IUser } from '../types/interface.js'
 
-interface IUser {
-  name: string
-  email: string
-  password: string
-}
 
 const userSchema = new mongoose.Schema<IUser>(
   {

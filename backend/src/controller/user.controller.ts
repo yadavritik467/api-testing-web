@@ -53,3 +53,12 @@ export const login_api = CatchAsync(async (req, res, next) => {
   res.cookie('token', token, { ...cookie_options })
   return sendResponse(res, 'Login Successfully ', 200)
 })
+
+export const my_profile = CatchAsync(async (req, res, next) => {
+  const userId = req?.user?._id
+  const user = await User.findById(userId).select('-password')
+  if (!user) {
+    return next(new AppError('User not found', 404))
+  }
+  return sendResponse(res,"",200,{user})
+})

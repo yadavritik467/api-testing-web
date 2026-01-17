@@ -4,7 +4,7 @@ import { dbConnection } from './db/db.js'
 import logger from './utils/logger.js'
 import { configDotenv } from 'dotenv'
 import { FRONT_URL, PORT } from './config/environment.js'
-import { errorMiddleware } from './middleware/errorMiddleware.js'
+import { errorMiddleware } from './middleware/error.middleware.js'
 import  userRoutes from './routes/user.route.js'
 
 configDotenv({ path: './.env' })
