@@ -2,12 +2,23 @@ name: Backend Deploy on AWS EC2
 
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'backend/**' 
-      - ".github/workflows/backend-deployment.yml"
-   
+  #  uncomment the below code to allow auto deploy in ec2 
+  # push:  
+  #   branches: [ main ] 
+    
+  #   paths:
+  #     - 'backend/**' 
+  #     - ".github/workflows/backend-deployment.yml"
+      
+  #   paths-ignore:
+  #     - 'backend/.dockerignore'
+  #     - 'backend/.prettierignore'  
+  #     - 'backend/.prettierrc.json'  
+  #     - 'backend/Dockerfile'
+  #     - 'backend/eslint.config.mjs'
+  #     - 'backend/.dockerignore'  
+  #     - 'backend/.tsconfig.json'  
+
   workflow_dispatch:    
 
 concurrency:
