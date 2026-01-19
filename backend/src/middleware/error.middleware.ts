@@ -1,7 +1,7 @@
-import type { NextFunction, Request, Response } from "express"
-import { AppError } from "../errors/AppError.js"
-import { IS_PROD } from "../config/environment.js"
-import { sendResponse } from "../utils/feature.js"
+import type { NextFunction, Request, Response } from 'express'
+import { AppError } from '../errors/AppError.js'
+import { IS_PROD } from '../config/environment.js'
+import { sendResponse } from '../utils/feature.js'
 
 export const errorMiddleware = (
   err: Error,

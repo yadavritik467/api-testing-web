@@ -60,5 +60,5 @@ export const my_profile = CatchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError('User not found', 404))
   }
-  return sendResponse(res,"",200,{user})
+  return sendResponse(res, '', 200, { user })
 })

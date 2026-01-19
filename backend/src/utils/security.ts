@@ -25,7 +25,7 @@ export const generate_token = (userId: string): string => {
 
 export const verify_token = (token: string, next: NextFunction) => {
   try {
-    const decode :any = jwt.verify(token, JWT_SECRET)
+    const decode: any = jwt.verify(token, JWT_SECRET)
     return decode
   } catch (error) {
     logger.error(error)

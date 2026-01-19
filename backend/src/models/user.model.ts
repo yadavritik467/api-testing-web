@@ -1,7 +1,6 @@
 import mongoose from 'mongoose'
 import type { IUser } from '../types/interface.js'
 
-
 const userSchema = new mongoose.Schema<IUser>(
   {
     name: {

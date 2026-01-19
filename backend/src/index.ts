@@ -5,7 +5,7 @@ import logger from './utils/logger.js'
 import { configDotenv } from 'dotenv'
 import { FRONT_URL, PORT } from './config/environment.js'
 import { errorMiddleware } from './middleware/error.middleware.js'
-import  userRoutes from './routes/user.route.js'
+import userRoutes from './routes/user.route.js'
 
 configDotenv({ path: './.env' })
 
@@ -21,7 +21,7 @@ dbConnection()
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
-app.use("/api/v1",userRoutes)
+app.use('/api/v1', userRoutes)
 
 app.use(errorMiddleware)
 app.get('/', (req: Request, res: Response) => {
