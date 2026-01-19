@@ -1,5 +1,11 @@
-import type { Request } from "express"
+import type { Request } from 'express'
 
+export interface ICollaboration {
+  collaboratorID: string
+  collectionID: string
+  isAccepted: boolean
+  invitedBy: string
+}
 export interface IUser {
   name: string
   email: string
